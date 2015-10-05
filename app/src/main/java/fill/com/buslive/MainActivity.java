@@ -40,8 +40,6 @@ import material.MaterialProgressBar;
 
 //TODO: Сделать напоминалку (типа будильник, заводишь на определенное время, на определенный автобус)
 
-//TODO:  Если быстро включить и выключить какойнибудь маршрут не дождавшись ответа, на карте появляются черные маркеры (Исправить)
-
 //TODO: Если SlidingPanel expanded и перевернуть телефон, то toolbar перекрывает его (Исправить)
 public class MainActivity extends GatewaedActivity {
 

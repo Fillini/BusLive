@@ -264,16 +264,20 @@ public class MapDrawHelper {
         Bitmap bm = Bitmap.createBitmap(WIDTH_BASE, HEIGHT_BASE, Bitmap.Config.ARGB_8888);
         Canvas canv = new Canvas(bm);
 
-        drawArrowCircle(canv, color,direction, WIDTH_BASE, HEIGHT_BASE,  CIRCLE_MODE.ARROW_CIRCLE);
+        drawArrowCircle(canv, color, direction, WIDTH_BASE, HEIGHT_BASE, CIRCLE_MODE.ARROW_CIRCLE);
 
         /**
          * Ширина текста 1/4 от базовой
          */
-        Paint textPaint = new Paint();
-        textPaint.setTextSize(WIDTH_BASE / 4);
-        textPaint.setFilterBitmap(true);
+
 
         String name = findBusNumberByRoute(busreportRouteId);
+
+        float textSize = WIDTH_BASE/4;
+
+        Paint textPaint = new Paint();
+        textPaint.setTextSize(textSize);
+        textPaint.setFilterBitmap(true);
 
         Rect bounds = new Rect();
         textPaint.getTextBounds(name, 0, name.length(), bounds);
@@ -300,12 +304,15 @@ public class MapDrawHelper {
         /**
          * Ширина текста 1/4 от базовой
          */
+
+        String name = findBusNumberByRoute(busreportRouteId);
+
+        float textSize = WIDTH_BASE/4;
         Paint textPaint = new Paint();
-        textPaint.setTextSize(WIDTH_BASE / 4);
+        textPaint.setTextSize(textSize);
         textPaint.setFilterBitmap(true);
 
 
-        String name = findBusNumberByRoute(busreportRouteId);
 
         Rect bounds = new Rect();
         textPaint.getTextBounds(name, 0, name.length(), bounds);
