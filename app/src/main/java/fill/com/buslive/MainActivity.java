@@ -365,7 +365,7 @@ public class MainActivity extends GatewaedActivity {
 
     @Override
     public void onFailure(String message) {
-        Snackbar.make(sliding_layout, "Ошибка получения данных", Snackbar.LENGTH_SHORT).show();
+        Snackbar.make(sliding_layout, "Ошибка получения данных.", Snackbar.LENGTH_SHORT).show();
         progress_bar.setVisibility(View.GONE);
     }
     /*--------------------------------*/
