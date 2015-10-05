@@ -1,6 +1,7 @@
 package fill.com.buslive;
 
 import android.content.Intent;
+import android.graphics.drawable.AnimationDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -244,17 +245,36 @@ public class MainActivity extends GatewaedActivity {
 
             @Override
             public void onPanelCollapsed(View panel) {
-                chevron_iv.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_chevron_double_up));
+                chevron_iv.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_chevron_double_down));
+                chevron_iv.setTag(R.drawable.ic_chevron_double_down);
+                Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.chevron_anim);
+                animation.setFillAfter(true);
+                chevron_iv.startAnimation(animation);
             }
 
             @Override
             public void onPanelExpanded(View panel) {
-                chevron_iv.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_chevron_double_down));
+                int id = chevron_iv.getTag() == null ? -1 : Integer.parseInt(chevron_iv.getTag().toString());
+                if(id==R.drawable.ic_chevron_double_down){
+                    chevron_iv.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_chevron_double_up));
+                    chevron_iv.setTag(R.drawable.ic_chevron_double_up);
+                    Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.chevron_anim);
+                    animation.setFillAfter(true);
+                    chevron_iv.startAnimation(animation);
+                }
+
             }
 
             @Override
             public void onPanelAnchored(View panel) {
-                chevron_iv.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_chevron_double_down));
+                int id = chevron_iv.getTag() == null ? -1 : Integer.parseInt(chevron_iv.getTag().toString());
+                if(id==R.drawable.ic_chevron_double_down){
+                    chevron_iv.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_chevron_double_up));
+                    chevron_iv.setTag(R.drawable.ic_chevron_double_up);
+                    Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.chevron_anim);
+                    animation.setFillAfter(true);
+                    chevron_iv.startAnimation(animation);
+                }
             }
 
             @Override
