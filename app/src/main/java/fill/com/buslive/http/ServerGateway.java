@@ -34,8 +34,8 @@ public class ServerGateway extends Gateway {
 
     public static final String COUNTRIES_PREFIX = "/countries";
     public static final String CITIES_PREFIX = "/countries/{country_id}/cities";
-    public static final String ROUTES_PREFIX = "/cities/{city_id}/routes";
-    public static final String STATIONS_PREFIX = "/cities/{city_id}/stations";
+    public static final String ROUTES_PREFIX = "/cities/{city_id}/routes/";
+    public static final String STATIONS_PREFIX = "/cities/{city_id}/stations/";
     public static final String BUSSES_PREFIX = "/cities/{city_id}/routes/{route_id}/busses";
 
     Retrofit retrofit;
@@ -109,6 +109,9 @@ public class ServerGateway extends Gateway {
         call.enqueue(new Callback<T>() {
             @Override
             public void onResponse(Response<T> response) {
+
+                L.trace(response.body());
+
                 callback.onSucces(response.body());
             }
 

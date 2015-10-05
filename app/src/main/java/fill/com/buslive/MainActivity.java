@@ -3,6 +3,7 @@ package fill.com.buslive;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.TypedValue;
@@ -95,9 +96,7 @@ public class MainActivity extends GatewaedActivity {
         adjustMap();
         setListeners();
 
-        for(int i=0;i<100; i++){
-            L.trace("Hello git");
-        }
+
 
         progress_bar.setColorSchemeColors(getResources().getIntArray(R.array.routecolors));
         progress_bar.setVisibility(View.GONE);
@@ -346,6 +345,7 @@ public class MainActivity extends GatewaedActivity {
             Geocode geocode = (Geocode) response;
             spHelper.setCoords(geocode.getLatitude() + ";" + geocode.getLongitude());
             map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(geocode.getLatitude(), geocode.getLongitude()), current_zoom));
+            bus_btn.performClick();
         }
         if (response instanceof Busses) {
             Busses busses = (Busses) response;
@@ -365,7 +365,7 @@ public class MainActivity extends GatewaedActivity {
 
     @Override
     public void onFailure(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        Snackbar.make(sliding_layout, "Ошибка получения данных", Snackbar.LENGTH_SHORT).show();
         progress_bar.setVisibility(View.GONE);
     }
     /*--------------------------------*/

@@ -23,14 +23,15 @@ public class RoutesDeserializer implements JsonDeserializer<Routes> {
     @Override
     public Routes deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
 
+
         Routes routes = new Routes();
         JsonArray jsonArray = json.getAsJsonArray();
         for(int i=0; i<jsonArray.size(); i++){
             JsonObject jsonObject = jsonArray.get(i).getAsJsonObject();
             Routes.Route route = new Routes.Route();
             route.setCityId(jsonObject.get("cityId").getAsString());
-            route.setRouteName(jsonObject.get("routeName").getAsString());
-            route.setRouteNumber(jsonObject.get("routeNumber").getAsString());
+            route.setRouteName(!jsonObject.get("routeName").isJsonNull()?jsonObject.get("routeName").getAsString():"");
+            route.setRouteNumber(!jsonObject.get("routeNumber").isJsonNull()? jsonObject.get("routeNumber").getAsString():"");
             route.setBussesOnRoute(jsonObject.get("bussesOnRoute").getAsString());
             route.setBusreportRouteId(jsonObject.get("busreportRouteId").getAsString());
             route.setLocation(parseLocation(jsonObject.get("location").getAsString()));
