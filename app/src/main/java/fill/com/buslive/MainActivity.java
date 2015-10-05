@@ -370,6 +370,7 @@ public class MainActivity extends GatewaedActivity {
             mapDrawHelper.drawBusses(busses);
         }
         if (response instanceof Routes) {
+
             progress_bar.setVisibility(View.GONE);
             this.routes = (Routes) response;
             route_view.setRoutes(routes);
