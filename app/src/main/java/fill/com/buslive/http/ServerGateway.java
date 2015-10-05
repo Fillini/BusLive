@@ -7,6 +7,7 @@ import com.squareup.okhttp.Cache;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import fill.com.buslive.R;
 
@@ -25,6 +26,7 @@ import retrofit.Retrofit;
 import retrofit.http.GET;
 import retrofit.http.Headers;
 import retrofit.http.Path;
+import retrofit.http.Query;
 
 /**
  * Created by Fill on 11.12.2014.
@@ -37,6 +39,8 @@ public class ServerGateway extends Gateway {
     public static final String ROUTES_PREFIX = "/cities/{city_id}/routes/";
     public static final String STATIONS_PREFIX = "/cities/{city_id}/stations/";
     public static final String BUSSES_PREFIX = "/cities/{city_id}/routes/{route_id}/busses";
+
+
 
     Retrofit retrofit;
     Cache cache;
@@ -109,9 +113,6 @@ public class ServerGateway extends Gateway {
         call.enqueue(new Callback<T>() {
             @Override
             public void onResponse(Response<T> response) {
-
-                L.trace(response.body());
-
                 callback.onSucces(response.body());
             }
 
