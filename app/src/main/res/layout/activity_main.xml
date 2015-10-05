@@ -1,0 +1,114 @@
+
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/tools">
+
+
+    <com.sothree.slidinguppanel.SlidingUpPanelLayout
+        xmlns:sothree="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/sliding_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="bottom"
+        sothree:umanoDragView="@+id/dragView"
+        sothree:umanoInitialState="hidden"
+        sothree:umanoOverlay="true"
+        sothree:umanoPanelHeight="?android:attr/actionBarSize"
+        sothree:umanoParalaxOffset="100dp"
+        sothree:umanoFadeColor="@color/scrim_color"
+        sothree:umanoShadowHeight="4dp">
+
+    <RelativeLayout
+
+        android:id="@+id/content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <fragment
+            android:id="@+id/map"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            class="com.google.android.gms.maps.SupportMapFragment"
+            />
+
+
+        <ImageButton
+            android:id="@+id/bus_btn"
+            android:layout_marginLeft="10dp"
+            android:src="@drawable/ic_directions_bus"
+            android:text="Hello_btn"
+            android:background="@drawable/btn_bckg"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
+    </RelativeLayout>
+
+
+        <!--  Sliding view -->
+        <LinearLayout
+            android:id="@+id/slideView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#ffffff"
+            android:clickable="true"
+            android:focusable="false"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/dragView"
+                android:layout_width="match_parent"
+                android:layout_height="?android:attr/actionBarSize"
+                android:background="#fafafa"
+                android:orientation="horizontal">
+
+                <material.MaterialProgressBar
+                    android:gravity="center"
+                    android:id="@+id/progress_bar"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:progress_stoke_width="2dp"
+                    />
+
+                <ImageView
+                    android:id="@+id/chevron_iv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <fill.com.buslive.fragments.views.RoutesComponent
+                    android:id="@+id/route_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+
+            </LinearLayout>
+        </LinearLayout>
+        <!--  Sliding view -->
+
+    </com.sothree.slidinguppanel.SlidingUpPanelLayout>
+
+
+
+    <android.support.v7.widget.Toolbar
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="?attr/actionBarSize"
+        style="@style/MyActionBar"
+        app:popupTheme="@style/ThemeOverlay.AppCompat"
+        />
+
+
+</RelativeLayout>
+
+
