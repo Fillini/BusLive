@@ -36,6 +36,12 @@ import fill.com.buslive.http.pojo.Routes;
 public class MapDrawHelper {
 
 
+    enum CIRCLE_MODE{
+        CIRCLE,ARROW_CIRCLE
+    }
+
+
+    private static final float PREMEDIUM_ZOOM_THRESHOLD = 14;
     private static final float MEDIUM_ZOOM_THRESHOLD = 13;
     private static final float SMALL_ZOOM_THRESHOLD = 12;
 
@@ -88,6 +94,9 @@ public class MapDrawHelper {
                 op.position(bus.getLatLon().toLatLng());
                 Integer direction = Integer.valueOf(bus.getDirection());
                 int color = findColorOfRoute(bus);
+                if(color==-1){
+                    continue;
+                }
                 float zoom = map.getCameraPosition().zoom;
 
                 Bitmap arrow = arrowBitmapFactory(zoom, direction, color, bus.getBusreportRouteId());
@@ -120,6 +129,9 @@ public class MapDrawHelper {
             Busses.Bus bus = ((Busses.Bus) markers.get(i).get("bus"));
             Integer direction = Integer.valueOf(bus.getDirection());
             int color = findColorOfRoute(bus);
+            if(color==-1){
+                continue;
+            }
             float zoom = map.getCameraPosition().zoom;
 
             Bitmap arrow = arrowBitmapFactory(zoom, direction, color, bus.getBusreportRouteId());
@@ -131,10 +143,12 @@ public class MapDrawHelper {
 
     private Bitmap arrowBitmapFactory(float zoom, int direction, int color, String busreportRouteId){
         Bitmap arrow = null;
-        if(map.getCameraPosition().zoom<=SMALL_ZOOM_THRESHOLD){
+        if(zoom<=SMALL_ZOOM_THRESHOLD){
             arrow = createSmallArrowBitmap(direction, color, busreportRouteId);
-        }else if((zoom>=SMALL_ZOOM_THRESHOLD) && ((zoom<=MEDIUM_ZOOM_THRESHOLD))){
+        }else if((zoom>=SMALL_ZOOM_THRESHOLD) && ((zoom<=MEDIUM_ZOOM_THRESHOLD))) {
             arrow = createMediumArrowBitmap(direction, color, busreportRouteId);
+        }else if((zoom>=MEDIUM_ZOOM_THRESHOLD) &&(zoom<=PREMEDIUM_ZOOM_THRESHOLD)  ){
+            arrow = createPreMediumArrowBitmap(direction, color, busreportRouteId);
         }else {
             arrow = createBigestArrowBitmap(direction, color, busreportRouteId);
         }
@@ -181,7 +195,7 @@ public class MapDrawHelper {
             }
         }
 
-        return 0;
+        return -1;
     }
 
     private String findBusNumberByRoute(String StringBusReportId) {
@@ -250,25 +264,38 @@ public class MapDrawHelper {
         Bitmap bm = Bitmap.createBitmap(WIDTH_BASE, HEIGHT_BASE, Bitmap.Config.ARGB_8888);
         Canvas canv = new Canvas(bm);
 
-        Paint circlePaint = new Paint();
-        circlePaint.setColor(Color.WHITE);
-        canv.drawCircle(WIDTH_BASE/2, HEIGHT_BASE/2, WIDTH_BASE / 2 - 1, circlePaint);
+        drawArrowCircle(canv, color,direction, WIDTH_BASE, HEIGHT_BASE,  CIRCLE_MODE.ARROW_CIRCLE);
 
-        Paint paint = new Paint();
-        paint.setFilterBitmap(true);
-        ColorFilter filter = new LightingColorFilter(color + Color.alpha(255), 1);
-        paint.setColorFilter(filter);
+        /**
+         * Ширина текста 1/4 от базовой
+         */
+        Paint textPaint = new Paint();
+        textPaint.setTextSize(WIDTH_BASE / 4);
+        textPaint.setFilterBitmap(true);
 
-        Bitmap arrowBitmap = BitmapFactory.decodeResource(resources, R.drawable.marker_a);
+        String name = findBusNumberByRoute(busreportRouteId);
 
-        Bitmap scalable = Bitmap.createScaledBitmap(arrowBitmap, WIDTH_BASE, HEIGHT_BASE, false);
+        Rect bounds = new Rect();
+        textPaint.getTextBounds(name, 0, name.length(), bounds);
+        int x = (canv.getWidth() / 2) - (bounds.width() / 2)-(name.length()/2);
+        float y = (canv.getHeight() / 2) - (bounds.height() / 2) - textPaint.descent() - textPaint.ascent();
+        canv.drawText(name, x, y, textPaint);
 
-        Matrix matrix = new Matrix();
-        matrix.setRotate(direction, scalable.getWidth() / 2, scalable.getHeight() / 2);
+        return bm;
+    }
 
-        canv.setMatrix(matrix);
-        canv.drawBitmap(scalable, 0, 0, paint);
-        canv.setMatrix(null);
+
+    private Bitmap createPreMediumArrowBitmap(Integer direction, int color, String busreportRouteId){
+        /**
+         * Ширина и высота берется из расчета 1/15 от ширины экрана
+         */
+        int WIDTH_BASE = display_width / 15;
+        int HEIGHT_BASE = display_width / 15;
+
+        Bitmap bm = Bitmap.createBitmap(WIDTH_BASE, HEIGHT_BASE, Bitmap.Config.ARGB_8888);
+        Canvas canv = new Canvas(bm);
+
+        drawArrowCircle(canv, color,direction, WIDTH_BASE, HEIGHT_BASE,  CIRCLE_MODE.ARROW_CIRCLE);
 
         /**
          * Ширина текста 1/4 от базовой
@@ -300,27 +327,7 @@ public class MapDrawHelper {
 
         Bitmap bm = Bitmap.createBitmap(WIDTH_BASE, HEIGHT_BASE, Bitmap.Config.ARGB_8888);
         Canvas canv = new Canvas(bm);
-
-        Paint circlePaint = new Paint();
-        circlePaint.setColor(Color.WHITE);
-        canv.drawCircle(WIDTH_BASE/2, HEIGHT_BASE/2, WIDTH_BASE / 2 - 1, circlePaint);
-
-        Paint paint = new Paint();
-        paint.setFilterBitmap(true);
-        ColorFilter filter = new LightingColorFilter(color + Color.alpha(255), 1);
-        paint.setColorFilter(filter);
-
-        Bitmap arrowBitmap = BitmapFactory.decodeResource(resources, R.drawable.marker_a);
-
-        Bitmap scalable = Bitmap.createScaledBitmap(arrowBitmap, WIDTH_BASE, HEIGHT_BASE, false);
-
-        Matrix matrix = new Matrix();
-        matrix.setRotate(direction, scalable.getWidth() / 2, scalable.getHeight() / 2);
-
-        canv.setMatrix(matrix);
-        canv.drawBitmap(scalable, 0, 0, paint);
-        canv.setMatrix(null);
-
+        drawArrowCircle(canv, color, direction, WIDTH_BASE, HEIGHT_BASE, CIRCLE_MODE.ARROW_CIRCLE);
         return bm;
     }
 
@@ -337,18 +344,35 @@ public class MapDrawHelper {
         Bitmap bm = Bitmap.createBitmap(WIDTH_BASE, HEIGHT_BASE, Bitmap.Config.ARGB_8888);
         Canvas canv = new Canvas(bm);
 
+        drawArrowCircle(canv, color, direction, WIDTH_BASE, HEIGHT_BASE, CIRCLE_MODE.CIRCLE);
+
+        return bm;
+    }
+
+
+
+    private void drawArrowCircle(Canvas canv, int color, int direction, int base_width, int base_height, CIRCLE_MODE mode){
+
         Paint circlePaint = new Paint();
         circlePaint.setColor(Color.WHITE);
-        canv.drawCircle(WIDTH_BASE/2, HEIGHT_BASE/2, WIDTH_BASE / 2 - 1, circlePaint);
+        circlePaint.setAntiAlias(true);
+        circlePaint.setFilterBitmap(true);
+        canv.drawCircle(base_width / 2, base_height / 2, base_width / 2 - 1, circlePaint);
 
         Paint paint = new Paint();
+        paint.setFilterBitmap(true);
+        paint.setAntiAlias(true);
         paint.setFilterBitmap(true);
         ColorFilter filter = new LightingColorFilter(color + Color.alpha(255), 1);
         paint.setColorFilter(filter);
 
-        Bitmap arrowBitmap = BitmapFactory.decodeResource(resources, R.drawable.marker);
-
-        Bitmap scalable = Bitmap.createScaledBitmap(arrowBitmap, WIDTH_BASE, HEIGHT_BASE, false);
+        Bitmap arrowBitmap;
+        if(mode==CIRCLE_MODE.CIRCLE){
+            arrowBitmap = BitmapFactory.decodeResource(resources, R.drawable.marker);
+        }else{
+            arrowBitmap = BitmapFactory.decodeResource(resources, R.drawable.marker_a);
+        }
+        Bitmap scalable = Bitmap.createScaledBitmap(arrowBitmap, base_width, base_height, false);
 
         Matrix matrix = new Matrix();
         matrix.setRotate(direction, scalable.getWidth() / 2, scalable.getHeight() / 2);
@@ -357,8 +381,8 @@ public class MapDrawHelper {
         canv.drawBitmap(scalable, 0, 0, paint);
         canv.setMatrix(null);
 
-        return bm;
     }
+
 
 
 
