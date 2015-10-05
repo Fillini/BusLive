@@ -10,9 +10,7 @@ import fill.com.buslive.http.ServerGateway;
 import fill.com.buslive.http.pojo.AbstractPOJO;
 import fill.com.buslive.utils.SPHelper;
 
-/**
- * Created by Fill on 02.10.2015.
- */
+
 public class GatewaedActivity extends AppCompatActivity implements
         ResponseCallback {
 

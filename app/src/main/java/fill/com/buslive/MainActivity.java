@@ -95,6 +95,10 @@ public class MainActivity extends GatewaedActivity {
         adjustMap();
         setListeners();
 
+        for(int i=0;i<100; i++){
+            L.trace("Hello git");
+        }
+
         progress_bar.setColorSchemeColors(getResources().getIntArray(R.array.routecolors));
         progress_bar.setVisibility(View.GONE);
 
