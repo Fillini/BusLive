@@ -363,7 +363,7 @@ public class MainActivity extends GatewaedActivity {
             Geocode geocode = (Geocode) response;
             spHelper.setCoords(geocode.getLatitude() + ";" + geocode.getLongitude());
             map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(geocode.getLatitude(), geocode.getLongitude()), current_zoom));
-            bus_btn.performClick();
+
         }
         if (response instanceof Busses) {
             Busses busses = (Busses) response;
