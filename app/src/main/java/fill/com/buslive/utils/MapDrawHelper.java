@@ -100,8 +100,7 @@ public class MapDrawHelper {
                 }
                 float zoom = map.getCameraPosition().zoom;
 
-                //Bitmap arrow = arrowBitmapFactory(zoom, direction, color, bus.getBusreportRouteId());
-
+                /*заглушка*/
                 Bitmap stub_bitmap = Bitmap.createBitmap(1,1, Bitmap.Config.RGB_565);
 
                 op.icon(BitmapDescriptorFactory.fromBitmap(stub_bitmap));
@@ -412,6 +411,8 @@ public class MapDrawHelper {
      */
     public void drawRoutes(ArrayList<Routes.Route> checkedRoute) {
 
+
+
         clearAllLines();
 
         clearAllMarkers();
@@ -436,7 +437,6 @@ public class MapDrawHelper {
             lines.add(map);
         }
 
-
     }
 
 
@@ -460,17 +460,6 @@ public class MapDrawHelper {
             this.color = color;
             this.busreportRouteId = busreportRouteId;
         }
-
-        public AsyncBitmapFactory(MarkerOptions options, float zoom, int direction, int color, String busreportRouteId) {
-            this.options = options;
-            this.zoom = zoom;
-            this.direction = direction;
-            this.color = color;
-            this.busreportRouteId = busreportRouteId;
-        }
-
-
-
         @Override
         protected Bitmap doInBackground(Void... voids) {
             Bitmap bitmap = arrowBitmapFactory(zoom, direction, color, busreportRouteId);

@@ -45,6 +45,8 @@ import material.MaterialProgressBar;
 //TODO: Сделать напоминалку (типа будильник, заводишь на определенное время, на определенный автобус)
 
 //TODO: Если SlidingPanel expanded и перевернуть телефон, то toolbar перекрывает его (Исправить)
+
+//TODO: Сделать что то с drag_view. Убрать эту уродскую стрелочку
 public class MainActivity extends GatewaedActivity {
 
 
@@ -317,9 +319,7 @@ public class MainActivity extends GatewaedActivity {
             outState.putFloat(CURRENT_ZOOM_MAP_KEY, map.getCameraPosition().zoom);
             outState.putParcelable(CURRENT_LAT_LNG_KEY, map.getCameraPosition().target);
         }
-
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -355,9 +355,7 @@ public class MainActivity extends GatewaedActivity {
         if(this.checkedRoute.size()==0){
             mapDrawHelper.drawRoutes(this.checkedRoute);
         }
-
     }
-
 
     @Override
     public void onBackPressed() {

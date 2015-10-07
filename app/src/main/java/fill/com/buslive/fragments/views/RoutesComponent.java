@@ -180,8 +180,11 @@ public class RoutesComponent extends LinearLayout {
             AsyncBitmapCreate asyncBitmapCreate = new AsyncBitmapCreate(bus_icon_iv, getContext());
             asyncBitmapCreate.execute(route_number);
 
+
             if (checkedset.contains(routes.get(position))) {
                 text.setChecked(true);
+            }else{
+                text.setChecked(false);
             }
             return convertView;
         }
@@ -210,7 +213,6 @@ public class RoutesComponent extends LinearLayout {
         public AsyncBitmapCreate(ImageView bus_icon_iv, Context context ) {
             this.bus_icon_iv = bus_icon_iv;
             this.context = context;
-
         }
 
         @Override
