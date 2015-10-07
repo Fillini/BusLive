@@ -8,6 +8,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.Image;
+import android.os.AsyncTask;
 import android.support.v4.content.ContextCompat;
 import android.text.TextPaint;
 import android.util.AttributeSet;
@@ -112,23 +113,15 @@ public class RoutesComponent extends LinearLayout {
     public class RoutesAdapter extends BaseAdapter {
 
 
-        Bitmap bus_icon_bitmap;
+
         Bitmap bm;
         Canvas canv;
         Bitmap scalable;
 
-        ArrayList<Bitmap> createdBitmap = new ArrayList<>();
-
 
         public RoutesAdapter() {
 
-            BitmapDrawable drawable = (BitmapDrawable) ContextCompat.getDrawable(getContext(), R.drawable.bus_number_icon);
-            Bitmap bitmap = drawable.getBitmap();
 
-            this.bus_icon_bitmap = bitmap;
-            scalable = Bitmap.createScaledBitmap(bus_icon_bitmap, 200, 100, false);
-            //canv.drawBitmap(scalable, 0, 0, new Paint());
-            createdBitmap = new ArrayList<>(routes.size());
 
         }
 
@@ -149,9 +142,7 @@ public class RoutesComponent extends LinearLayout {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-
             ViewHolder v_h;
-            boolean isCreated;
 
             if (convertView == null) {
                 convertView = inflater.inflate(R.layout.item_route, parent, false);
@@ -186,39 +177,8 @@ public class RoutesComponent extends LinearLayout {
 
             text.setCheckMarkDrawable(R.drawable.check_mark);
 
-            bm = Bitmap.createBitmap(200, 100, Bitmap.Config.ARGB_8888);
-            canv = new Canvas(bm);
-            canv.drawBitmap(scalable, 0, 0, new Paint());
-            /**
-             * Ширина текста 1/2 от базовой
-             */
-            float textSize = new Float(bm.getWidth()/2.2);
-            if(route_number.length()>3){
-                textSize /= 1.3;
-            }
-
-            Paint textPaint = new Paint();
-            textPaint.setTextSize(textSize);
-            textPaint.setAntiAlias(true);
-            textPaint.setFilterBitmap(true);
-
-            Rect bounds = new Rect();
-            textPaint.getTextBounds(route_number, 0, route_number.length(), bounds);
-            int x = (canv.getWidth() / 2) - (bounds.width() / 2) - (route_name.length() / 2);
-            float y = (canv.getHeight() / 2) - (bounds.height() / 2) - textPaint.descent() - textPaint.ascent();
-            canv.drawText(route_number, x, y, textPaint);
-
-            Paint stkPaint = new Paint();
-            stkPaint.setStyle(Paint.Style.STROKE);
-            stkPaint.setTextSize(textSize);
-            stkPaint.setStrokeWidth(3);
-            stkPaint.setColor(Color.WHITE);
-            stkPaint.setAntiAlias(true);
-            stkPaint.setFilterBitmap(true);
-
-            canv.drawText(route_number, x, y, stkPaint);
-
-            bus_icon_iv.setImageBitmap(bm);
+            AsyncBitmapCreate asyncBitmapCreate = new AsyncBitmapCreate(bus_icon_iv, getContext());
+            asyncBitmapCreate.execute(route_number);
 
             if (checkedset.contains(routes.get(position))) {
                 text.setChecked(true);
@@ -239,5 +199,72 @@ public class RoutesComponent extends LinearLayout {
     public interface OnCheckRouteListener {
         void onCheckRoute(ArrayList<Routes.Route> checkedRoutes);
     }
+
+    public static class AsyncBitmapCreate extends AsyncTask<String, Void, Bitmap>{
+
+
+        Canvas canv;
+        ImageView bus_icon_iv;
+        Context context;
+
+        public AsyncBitmapCreate(ImageView bus_icon_iv, Context context ) {
+            this.bus_icon_iv = bus_icon_iv;
+            this.context = context;
+
+        }
+
+        @Override
+        protected Bitmap doInBackground(String... params) {
+
+            BitmapDrawable drawable = (BitmapDrawable) ContextCompat.getDrawable(context, R.drawable.bus_number_icon);
+            Bitmap bitmap = drawable.getBitmap();
+            Bitmap scalable = Bitmap.createScaledBitmap(bitmap, 200, 100, false);
+
+
+            Bitmap bm = Bitmap.createBitmap(200, 100, Bitmap.Config.ARGB_8888);
+            canv = new Canvas(bm);
+            canv.drawBitmap(scalable, 0, 0, new Paint());
+
+            String route_number = params[0];
+
+            /**
+             * Ширина текста 1/2 от базовой
+             */
+            float textSize = new Float(bm.getWidth()/2.2);
+            if(route_number.length()>3){
+                textSize /= 1.3;
+            }
+
+            Paint textPaint = new Paint();
+            textPaint.setTextSize(textSize);
+            textPaint.setAntiAlias(true);
+            textPaint.setFilterBitmap(true);
+
+            Rect bounds = new Rect();
+            textPaint.getTextBounds(route_number, 0, route_number.length(), bounds);
+            int x = (canv.getWidth() / 2) - (bounds.width() / 2) - (route_number.length() / 2);
+            float y = (canv.getHeight() / 2) - (bounds.height() / 2) - textPaint.descent() - textPaint.ascent();
+            canv.drawText(route_number, x, y, textPaint);
+
+            Paint stkPaint = new Paint();
+            stkPaint.setStyle(Paint.Style.STROKE);
+            stkPaint.setTextSize(textSize);
+            stkPaint.setStrokeWidth(3);
+            stkPaint.setColor(Color.WHITE);
+            stkPaint.setAntiAlias(true);
+            stkPaint.setFilterBitmap(true);
+            canv.drawText(route_number, x, y, stkPaint);
+            return bm;
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+            super.onPostExecute(bitmap);
+            bus_icon_iv.setImageBitmap(bitmap);
+        }
+    }
+
+
+
 
 }

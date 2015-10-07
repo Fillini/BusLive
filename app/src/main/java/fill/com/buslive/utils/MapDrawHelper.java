@@ -11,6 +11,7 @@ import android.graphics.LightingColorFilter;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.os.AsyncTask;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -99,13 +100,18 @@ public class MapDrawHelper {
                 }
                 float zoom = map.getCameraPosition().zoom;
 
-                Bitmap arrow = arrowBitmapFactory(zoom, direction, color, bus.getBusreportRouteId());
+                //Bitmap arrow = arrowBitmapFactory(zoom, direction, color, bus.getBusreportRouteId());
 
-                op.icon(BitmapDescriptorFactory.fromBitmap(arrow));
+                Bitmap stub_bitmap = Bitmap.createBitmap(1,1, Bitmap.Config.RGB_565);
+
+                op.icon(BitmapDescriptorFactory.fromBitmap(stub_bitmap));
 
                 clearMarkerByBusName(bus);
 
                 Marker marker = map.addMarker(op);
+
+                AsyncBitmapFactory task = new AsyncBitmapFactory(marker, zoom, direction, color, bus.getBusreportRouteId());
+                task.execute();
 
                 Map<String, Object> map = new HashMap<>();
                 map.put("bus", bus);
@@ -134,8 +140,12 @@ public class MapDrawHelper {
             }
             float zoom = map.getCameraPosition().zoom;
 
-            Bitmap arrow = arrowBitmapFactory(zoom, direction, color, bus.getBusreportRouteId());
-            marker.setIcon(BitmapDescriptorFactory.fromBitmap(arrow));
+
+            AsyncBitmapFactory tast = new AsyncBitmapFactory(marker, zoom, direction, color, bus.getBusreportRouteId());
+            tast.execute();
+
+            /*Bitmap arrow = arrowBitmapFactory(zoom, direction, color, bus.getBusreportRouteId());
+            marker.setIcon(BitmapDescriptorFactory.fromBitmap(arrow));*/
         }
 
     }
@@ -428,6 +438,59 @@ public class MapDrawHelper {
 
 
     }
+
+
+
+
+
+
+    public class AsyncBitmapFactory extends AsyncTask<Void, Void, Bitmap>{
+
+        float zoom;
+        int direction;
+        int color;
+        String busreportRouteId;
+        Marker marker;
+        MarkerOptions options;
+
+        public AsyncBitmapFactory(Marker marker, float zoom, int direction, int color, String busreportRouteId) {
+            this.marker = marker;
+            this.zoom = zoom;
+            this.direction = direction;
+            this.color = color;
+            this.busreportRouteId = busreportRouteId;
+        }
+
+        public AsyncBitmapFactory(MarkerOptions options, float zoom, int direction, int color, String busreportRouteId) {
+            this.options = options;
+            this.zoom = zoom;
+            this.direction = direction;
+            this.color = color;
+            this.busreportRouteId = busreportRouteId;
+        }
+
+
+
+        @Override
+        protected Bitmap doInBackground(Void... voids) {
+            Bitmap bitmap = arrowBitmapFactory(zoom, direction, color, busreportRouteId);
+            return bitmap;
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+            super.onPostExecute(bitmap);
+            if(marker!=null){
+                marker.setIcon(BitmapDescriptorFactory.fromBitmap(bitmap));
+            }
+            if(options!=null){
+                options.icon(BitmapDescriptorFactory.fromBitmap(bitmap));
+            }
+
+        }
+    }
+
+
 
 
 }

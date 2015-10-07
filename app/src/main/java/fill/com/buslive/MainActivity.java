@@ -1,10 +1,11 @@
 package fill.com.buslive;
 
 import android.content.Intent;
-import android.graphics.drawable.AnimationDrawable;
-import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.TypedValue;
@@ -17,7 +18,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -29,6 +29,8 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import java.util.ArrayList;
 
 import de.greenrobot.event.EventBus;
+import fill.com.buslive.event.CheckRouteEvent;
+import fill.com.buslive.fragments.RoutesFragment;
 import fill.com.buslive.fragments.views.RoutesComponent;
 import fill.com.buslive.http.pojo.AbstractPOJO;
 import fill.com.buslive.http.pojo.Busses;
@@ -64,6 +66,8 @@ public class MainActivity extends GatewaedActivity {
 
     EventBus eventbus = EventBus.getDefault();
 
+    LinearLayout slide_container;
+
 
     public static final int SETTINGS_RESULT = 1;
     public static final int ROUTES_RESULT = 2;
@@ -91,6 +95,7 @@ public class MainActivity extends GatewaedActivity {
         route_view = (RoutesComponent) findViewById(R.id.route_view);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         chevron_iv = (ImageView) findViewById(R.id.chevron_iv);
+        slide_container = (LinearLayout)findViewById(R.id.slide_container);
 
         setSupportActionBar(toolbar);
 
@@ -115,22 +120,26 @@ public class MainActivity extends GatewaedActivity {
             restoreFromSavedInstance(savedInstanceState);
         }
 
-
         if (checkedRoute != null) {
-            route_view.setCheckedset(checkedRoute);
+            //route_view.setCheckedset(checkedRoute);
             periodicGateway.startGetBusses(checkedRoute);
         }
         if (routes != null) {
-            route_view.setRoutes(routes);
+            //route_view.setRoutes(routes);
         }
 
 
-
-/*
-        Intent intent = new Intent(this, RoutesActivity.class);
-        startActivityForResult(intent, ROUTES_RESULT);
-*/
     }
+
+
+    public void onEvent(CheckRouteEvent event){
+
+
+        setCheckedRoute(event.getChecked_route());
+
+    }
+
+
 
     /**
      * Сохраняем выбранные маршруты, актуальный зум, актуальные координаты
@@ -195,8 +204,6 @@ public class MainActivity extends GatewaedActivity {
                     params.setMargins(0, 0, 10, 10);
                     myLocationControl.setLayoutParams(params);
                 }
-
-
                 map.moveCamera(CameraUpdateFactory.zoomTo(current_zoom));
                 map.moveCamera(CameraUpdateFactory.newLatLngZoom(current_latlng, current_zoom));
                 mapDrawHelper = new MapDrawHelper(map, MainActivity.this);
@@ -230,12 +237,12 @@ public class MainActivity extends GatewaedActivity {
             }
         });
 
-        route_view.setOnCheckRouteListener(new RoutesComponent.OnCheckRouteListener() {
+        /*route_view.setOnCheckRouteListener(new RoutesComponent.OnCheckRouteListener() {
             @Override
             public void onCheckRoute(ArrayList<Routes.Route> checkedRoutes) {
                 setCheckedRoute(checkedRoutes);
             }
-        });
+        });*/
 
         sliding_layout.setPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
             @Override
@@ -341,9 +348,12 @@ public class MainActivity extends GatewaedActivity {
      */
     public void setCheckedRoute(ArrayList<Routes.Route> checkedRoute) {
         this.checkedRoute = checkedRoute;
-        if (this.checkedRoute != null) {
-            periodicGateway.startGetBusses(checkedRoute);
-            mapDrawHelper.drawRoutes(checkedRoute);
+        if (this.checkedRoute != null && this.checkedRoute.size()>0) {
+            periodicGateway.startGetBusses(this.checkedRoute);
+            mapDrawHelper.drawRoutes(this.checkedRoute);
+        }
+        if(this.checkedRoute.size()==0){
+            mapDrawHelper.drawRoutes(this.checkedRoute);
         }
     }
 
@@ -367,24 +377,43 @@ public class MainActivity extends GatewaedActivity {
             Geocode geocode = (Geocode) response;
             spHelper.setCoords(geocode.getLatitude() + ";" + geocode.getLongitude());
             map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(geocode.getLatitude(), geocode.getLongitude()), current_zoom));
-
-
-
-
         }
         if (response instanceof Busses) {
             Busses busses = (Busses) response;
             mapDrawHelper.drawBusses(busses);
         }
         if (response instanceof Routes) {
-
-            progress_bar.setVisibility(View.GONE);
             this.routes = (Routes) response;
-            route_view.setRoutes(routes);
             checkedRoute = new ArrayList<>();
-            route_view.setCheckedset(checkedRoute);
             setCheckedRoute(checkedRoute);
-            sliding_layout.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
+
+            FragmentManager fm = getSupportFragmentManager();
+            RoutesFragment mFragment = (RoutesFragment)fm.findFragmentByTag(RoutesFragment.TAG);
+            if(mFragment==null){
+                FragmentTransaction ft = fm.beginTransaction();
+                RoutesFragment fragment = RoutesFragment.newInstance(this.routes, checkedRoute);
+                ft.replace(R.id.slide_container, fragment, null);
+                try {
+                    ft.commit();
+                }catch (IllegalStateException e){
+                    mFragment=null;
+                }
+            }else{
+                if(mFragment.isInLayout()){
+                    /*   */
+                }
+            }
+
+            /* для плавности запускаем немного позже, после того как фрагмент добавится*/
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    progress_bar.setVisibility(View.GONE);
+                    sliding_layout.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
+                }
+            }, 200);
+
         }
 
     }
@@ -397,4 +426,9 @@ public class MainActivity extends GatewaedActivity {
     /*--------------------------------*/
 
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        eventbus.unregister(this);
+    }
 }

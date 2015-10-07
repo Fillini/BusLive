@@ -81,16 +81,15 @@
 
             </LinearLayout>
 
+
             <LinearLayout
+                android:orientation="vertical"
+                android:id="@+id/slide_container"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"></LinearLayout>
+            <!-- fragment container -->
 
-                <fill.com.buslive.fragments.views.RoutesComponent
-                    android:id="@+id/route_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"/>
 
-            </LinearLayout>
         </LinearLayout>
         <!--  Sliding view -->
 

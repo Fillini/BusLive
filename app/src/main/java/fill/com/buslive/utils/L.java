@@ -9,7 +9,7 @@ import android.util.Log;
  */
 public class L {
 
-    public final static boolean DEBUG = false;
+    public final static boolean DEBUG = true;
     static final String TAG = L.class.getPackage().toString();
 
     public final static int DEB = 0;
