@@ -355,6 +355,7 @@ public class MainActivity extends GatewaedActivity {
         if(this.checkedRoute.size()==0){
             mapDrawHelper.drawRoutes(this.checkedRoute);
         }
+
     }
 
 
