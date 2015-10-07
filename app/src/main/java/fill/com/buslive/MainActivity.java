@@ -28,6 +28,7 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import java.util.ArrayList;
 
+import de.greenrobot.event.EventBus;
 import fill.com.buslive.fragments.views.RoutesComponent;
 import fill.com.buslive.http.pojo.AbstractPOJO;
 import fill.com.buslive.http.pojo.Busses;
@@ -61,6 +62,8 @@ public class MainActivity extends GatewaedActivity {
     ArrayList<Routes.Route> checkedRoute;
     Routes routes;
 
+    EventBus eventbus = EventBus.getDefault();
+
 
     public static final int SETTINGS_RESULT = 1;
     public static final int ROUTES_RESULT = 2;
@@ -79,6 +82,7 @@ public class MainActivity extends GatewaedActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        eventbus.register(this);
         sliding_layout = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
         slideView = (LinearLayout) findViewById(R.id.slideView);
         bus_btn = (ImageButton) findViewById(R.id.bus_btn);
