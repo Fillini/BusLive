@@ -56,9 +56,7 @@ public class MapDrawHelper {
 
     int display_width;
 
-
     int[] colors;
-
 
     Busses busses;
     float currentZoom;
