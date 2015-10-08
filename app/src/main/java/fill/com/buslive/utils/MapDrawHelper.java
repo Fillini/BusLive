@@ -11,15 +11,20 @@ import android.graphics.LightingColorFilter;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.os.AsyncTask;
 
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.gms.maps.model.VisibleRegion;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,6 +34,7 @@ import java.util.Map;
 import fill.com.buslive.R;
 import fill.com.buslive.http.pojo.Busses;
 import fill.com.buslive.http.pojo.Routes;
+import fill.com.buslive.http.pojo.Stations;
 
 /**
  * Компонетн рисует на карте маркеры и линии.
@@ -46,6 +52,10 @@ public class MapDrawHelper {
     private static final float MEDIUM_ZOOM_THRESHOLD = 13;
     private static final float SMALL_ZOOM_THRESHOLD = 12;
 
+
+
+    private static final float STATION_ZOOM_THRESHOLD = 14; /*  Остановки видны на высоте 14 и ниже  (15,16,17 и.тд)*/
+
     GoogleMap map;
     Resources resources;
     Context context;
@@ -53,6 +63,8 @@ public class MapDrawHelper {
     ArrayList<Map<String, Object>> markers = new ArrayList<Map<String, Object>>();
 
     ArrayList<Map<String, Object>> lines = new ArrayList<>();
+
+    ArrayList<Stations> stations = new ArrayList<>();
 
     int display_width;
 
@@ -99,22 +111,17 @@ public class MapDrawHelper {
                 float zoom = map.getCameraPosition().zoom;
 
                 /*заглушка*/
-                Bitmap stub_bitmap = Bitmap.createBitmap(1,1, Bitmap.Config.RGB_565);
-
-                op.icon(BitmapDescriptorFactory.fromBitmap(stub_bitmap));
+                Bitmap arrow = arrowBitmapFactory(zoom, direction, color, bus.getBusreportRouteId());
+                op.icon(BitmapDescriptorFactory.fromBitmap(arrow));
 
                 clearMarkerByBusName(bus);
 
                 Marker marker = map.addMarker(op);
-
-                AsyncBitmapFactory task = new AsyncBitmapFactory(marker, zoom, direction, color, bus.getBusreportRouteId());
-                task.execute();
-
                 Map<String, Object> map = new HashMap<>();
                 map.put("bus", bus);
                 map.put("marker", marker);
-
                 markers.add(map);
+
             }
 
 
@@ -137,12 +144,8 @@ public class MapDrawHelper {
             }
             float zoom = map.getCameraPosition().zoom;
 
-
-            AsyncBitmapFactory tast = new AsyncBitmapFactory(marker, zoom, direction, color, bus.getBusreportRouteId());
-            tast.execute();
-
-            /*Bitmap arrow = arrowBitmapFactory(zoom, direction, color, bus.getBusreportRouteId());
-            marker.setIcon(BitmapDescriptorFactory.fromBitmap(arrow));*/
+            Bitmap arrow = arrowBitmapFactory(zoom, direction, color, bus.getBusreportRouteId());
+            marker.setIcon(BitmapDescriptorFactory.fromBitmap(arrow));
         }
 
     }
@@ -400,6 +403,36 @@ public class MapDrawHelper {
 
 
 
+    private Bitmap createSmallStationBitmap(){
+        /**
+         * Ширина и высота берется из расчета 1/20 от ширины экрана
+         */
+        int WIDTH_BASE = display_width / 30;
+        int HEIGHT_BASE = display_width / 30;
+
+        Bitmap bm = Bitmap.createBitmap(WIDTH_BASE, HEIGHT_BASE, Bitmap.Config.ARGB_8888);
+        Canvas canv = new Canvas(bm);
+        drawStationIcon(canv, WIDTH_BASE, HEIGHT_BASE);
+
+        return bm;
+    }
+
+    private void drawStationIcon(Canvas canv, int base_width, int base_height){
+
+        Bitmap stationBitmap;
+
+        stationBitmap = BitmapFactory.decodeResource(resources, R.drawable.bus_station_icon);
+        Bitmap scalable = Bitmap.createScaledBitmap(stationBitmap, base_width, base_height, false);
+
+        Paint paint = new Paint();
+        paint.setFilterBitmap(true);
+        paint.setAntiAlias(true);
+        paint.setFilterBitmap(true);
+
+        canv.drawBitmap(scalable, 0, 0, paint);
+
+
+    }
 
 
 
@@ -408,8 +441,6 @@ public class MapDrawHelper {
      * Метод отрисовывает на карте маршруты
      */
     public void drawRoutes(ArrayList<Routes.Route> checkedRoute) {
-
-
 
         clearAllLines();
 
@@ -439,6 +470,34 @@ public class MapDrawHelper {
 
 
 
+    public void drawStations(Stations stations){
+        Bitmap station_bitmap = createSmallStationBitmap();
+        BitmapDescriptor descriptor = BitmapDescriptorFactory.fromBitmap(station_bitmap);
+
+        for(int i=0; i<stations.size(); i++){
+            Stations.Station station = stations.get(i);
+
+            LatLng station_coords = station.getLatlon().toLatLng();
+            LatLng center_coords = map.getCameraPosition().target;
+
+            double distance = distance(station_coords, center_coords); /*  distance in km  */
+
+            if(distance<100){
+                MarkerOptions op = new MarkerOptions();
+                op.position(station.getLatlon().toLatLng());
+                op.icon(descriptor);
+                Marker marker = map.addMarker(op);
+            }
+
+        }
+
+    }
+
+    private double distance(LatLng p1, LatLng p2){
+        int R = 6371; /*Earth radius*/
+        return (Math.acos(Math.sin(p1.latitude)*Math.sin(p2.latitude)+Math.cos(p1.latitude)*Math.cos(p2.latitude) * Math.cos(p2.longitude-p1.longitude)) * R)/10;
+    }
+
 
 
 
@@ -467,13 +526,13 @@ public class MapDrawHelper {
         @Override
         protected void onPostExecute(Bitmap bitmap) {
             super.onPostExecute(bitmap);
-            if(marker!=null){
-                marker.setIcon(BitmapDescriptorFactory.fromBitmap(bitmap));
+            try{
+                if(marker!=null){
+                    marker.setIcon(BitmapDescriptorFactory.fromBitmap(bitmap));
+                }
+            }catch (Exception e){
+                e.printStackTrace();
             }
-            if(options!=null){
-                options.icon(BitmapDescriptorFactory.fromBitmap(bitmap));
-            }
-
         }
     }
 

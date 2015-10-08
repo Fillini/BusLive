@@ -37,6 +37,7 @@ import fill.com.buslive.http.pojo.Busses;
 import fill.com.buslive.http.pojo.Geocode;
 import fill.com.buslive.http.pojo.Routes;
 
+import fill.com.buslive.http.pojo.Stations;
 import fill.com.buslive.utils.L;
 import fill.com.buslive.utils.MapDrawHelper;
 import material.MaterialProgressBar;
@@ -226,6 +227,8 @@ public class MainActivity extends GatewaedActivity {
             String coords = spHelper.getCoords();
             String[] latlng = coords.split(";");
             current_latlng = new LatLng(Double.valueOf(latlng[0]), Double.valueOf(latlng[1]));
+            gateway.getStations(spHelper.getCity());
+
         }
     }
 
@@ -238,13 +241,6 @@ public class MainActivity extends GatewaedActivity {
                 progress_bar.setVisibility(View.VISIBLE);
             }
         });
-
-        /*route_view.setOnCheckRouteListener(new RoutesComponent.OnCheckRouteListener() {
-            @Override
-            public void onCheckRoute(ArrayList<Routes.Route> checkedRoutes) {
-                setCheckedRoute(checkedRoutes);
-            }
-        });*/
 
         sliding_layout.setPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
             @Override
@@ -376,10 +372,19 @@ public class MainActivity extends GatewaedActivity {
             Geocode geocode = (Geocode) response;
             spHelper.setCoords(geocode.getLatitude() + ";" + geocode.getLongitude());
             map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(geocode.getLatitude(), geocode.getLongitude()), current_zoom));
+
+            /*обновляем данные об остановках*/
+            gateway.getStations(spHelper.getCity());
+
+
         }
         if (response instanceof Busses) {
             Busses busses = (Busses) response;
             mapDrawHelper.drawBusses(busses);
+        }
+        if(response instanceof Stations){
+            Stations stations = (Stations)response;
+            mapDrawHelper.drawStations(stations);
         }
         if (response instanceof Routes) {
             this.routes = (Routes) response;
