@@ -66,6 +66,7 @@ public class MainActivity extends GatewaedActivity {
 
     ArrayList<Routes.Route> checkedRoute;
     Routes routes;
+    Stations stations;
 
     EventBus eventbus = EventBus.getDefault();
 
@@ -78,6 +79,7 @@ public class MainActivity extends GatewaedActivity {
 
     static final String CHECKED_ROUTES_KEY = "checked_routes"; /* отмеченные маршруты*/
     static final String ROUTES_KEY = "routes"; /* все маршруты*/
+    static final String STATIONS_KEY = "stations"; /* все остановки*/
     static final String CURRENT_ZOOM_MAP_KEY = "current_zoom_key";
     static final String CURRENT_LAT_LNG_KEY = "current_lat_lng_key";
     private float current_zoom = 12;
@@ -131,7 +133,6 @@ public class MainActivity extends GatewaedActivity {
             //route_view.setRoutes(routes);
         }
 
-
     }
 
 
@@ -152,6 +153,7 @@ public class MainActivity extends GatewaedActivity {
     private void restoreFromSavedInstance(Bundle savedInstanceState) {
         checkedRoute = ((ArrayList) savedInstanceState.getSerializable(CHECKED_ROUTES_KEY));
         routes = (Routes) savedInstanceState.getSerializable(ROUTES_KEY);
+        stations = (Stations) savedInstanceState.getSerializable(STATIONS_KEY);
 
         if(savedInstanceState.getParcelable(CURRENT_LAT_LNG_KEY)!=null){
             current_latlng = savedInstanceState.getParcelable(CURRENT_LAT_LNG_KEY);
@@ -227,8 +229,11 @@ public class MainActivity extends GatewaedActivity {
             String coords = spHelper.getCoords();
             String[] latlng = coords.split(";");
             current_latlng = new LatLng(Double.valueOf(latlng[0]), Double.valueOf(latlng[1]));
-            gateway.getStations(spHelper.getCity());
-
+            if(stations!=null){
+                mapDrawHelper.drawStations(stations);
+            }else{
+                gateway.getStations(spHelper.getCity());
+            }
         }
     }
 
@@ -311,6 +316,7 @@ public class MainActivity extends GatewaedActivity {
         super.onSaveInstanceState(outState);
         outState.putSerializable(CHECKED_ROUTES_KEY, checkedRoute);
         outState.putSerializable(ROUTES_KEY, routes);
+        outState.putSerializable(STATIONS_KEY, stations);
         if(map!=null){
             outState.putFloat(CURRENT_ZOOM_MAP_KEY, map.getCameraPosition().zoom);
             outState.putParcelable(CURRENT_LAT_LNG_KEY, map.getCameraPosition().target);

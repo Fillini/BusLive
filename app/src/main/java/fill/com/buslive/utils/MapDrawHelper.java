@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Objects;
 
 import fill.com.buslive.R;
 import fill.com.buslive.http.pojo.Busses;
@@ -54,7 +55,7 @@ public class MapDrawHelper {
 
 
 
-    private static final float STATION_ZOOM_THRESHOLD = 14; /*  Остановки видны на высоте 14 и ниже  (15,16,17 и.тд)*/
+    private static final float STATION_ZOOM_THRESHOLD = 15; /*  Остановки видны на высоте 14 и ниже  (15,16,17 и.тд)*/
 
     GoogleMap map;
     Resources resources;
@@ -64,7 +65,9 @@ public class MapDrawHelper {
 
     ArrayList<Map<String, Object>> lines = new ArrayList<>();
 
-    ArrayList<Stations> stations = new ArrayList<>();
+    ArrayList<Map<String, Object>> drawed_station = new ArrayList<>();
+
+    Stations stations;
 
     int display_width;
 
@@ -88,6 +91,10 @@ public class MapDrawHelper {
                 if(currentZoom!=cameraPosition.zoom){
                     forceRedrawBusses();
                     currentZoom=cameraPosition.zoom;
+                }
+
+                if(stations!=null) {
+                    drawStations(stations);
                 }
 
             }
@@ -471,31 +478,55 @@ public class MapDrawHelper {
 
 
     public void drawStations(Stations stations){
-        Bitmap station_bitmap = createSmallStationBitmap();
-        BitmapDescriptor descriptor = BitmapDescriptorFactory.fromBitmap(station_bitmap);
 
-        for(int i=0; i<stations.size(); i++){
-            Stations.Station station = stations.get(i);
+        clearAllStations();
+        this.stations = stations;
 
-            LatLng station_coords = station.getLatlon().toLatLng();
-            LatLng center_coords = map.getCameraPosition().target;
+        if(currentZoom>=STATION_ZOOM_THRESHOLD){
+            Bitmap station_bitmap = createSmallStationBitmap();
+            BitmapDescriptor descriptor = BitmapDescriptorFactory.fromBitmap(station_bitmap);
 
-            double distance = distance(station_coords, center_coords); /*  distance in km  */
+            VisibleRegion visibleRegion = map.getProjection().getVisibleRegion();
+            LatLngBounds bounds = visibleRegion.latLngBounds;
 
-            if(distance<100){
-                MarkerOptions op = new MarkerOptions();
-                op.position(station.getLatlon().toLatLng());
-                op.icon(descriptor);
-                Marker marker = map.addMarker(op);
+            for(int i=0; i<stations.size(); i++){
+                Stations.Station station = stations.get(i);
+                LatLng station_coords = station.getLatlon().toLatLng();
+                if(bounds.contains(station_coords)){
+                    MarkerOptions op = new MarkerOptions();
+                    op.position(station.getLatlon().toLatLng());
+                    op.icon(descriptor);
+                    Marker marker = map.addMarker(op);
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("station", marker);
+                    drawed_station.add(map);
+                }
             }
-
         }
 
+        orderingMarkers();
     }
+
+
+    private void orderingMarkers(){
+        for(int i=0; i<markers.size(); i++){
+            Marker marker = ((Marker) markers.get(i).get("marker"));
+            marker.showInfoWindow();
+        }
+    }
+
 
     private double distance(LatLng p1, LatLng p2){
         int R = 6371; /*Earth radius*/
         return (Math.acos(Math.sin(p1.latitude)*Math.sin(p2.latitude)+Math.cos(p1.latitude)*Math.cos(p2.latitude) * Math.cos(p2.longitude-p1.longitude)) * R)/10;
+    }
+
+    private void clearAllStations(){
+        for (int i = 0; i < drawed_station.size(); i++) {
+            Marker marker = ((Marker) drawed_station.get(i).get("station"));
+            marker.remove();
+        }
+        drawed_station.clear();
     }
 
 
