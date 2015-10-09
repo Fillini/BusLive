@@ -25,6 +25,9 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import fill.com.buslive.R;
 import fill.com.buslive.http.pojo.Routes;
@@ -48,6 +51,8 @@ public class RoutesComponent extends LinearLayout {
     OnCheckRouteListener onCheckRouteListener;
 
     ArrayList<Routes.Route> checkedset = new ArrayList<>();
+
+    ExecutorService service = Executors.newFixedThreadPool(1);
 
     public RoutesComponent(Context context) {
         super(context);
@@ -178,7 +183,7 @@ public class RoutesComponent extends LinearLayout {
             text.setCheckMarkDrawable(R.drawable.check_mark);
 
             AsyncBitmapCreate asyncBitmapCreate = new AsyncBitmapCreate(bus_icon_iv, getContext());
-            asyncBitmapCreate.execute(route_number);
+            asyncBitmapCreate.executeOnExecutor(service,route_number);
 
 
             if (checkedset.contains(routes.get(position))) {
@@ -256,6 +261,7 @@ public class RoutesComponent extends LinearLayout {
             stkPaint.setAntiAlias(true);
             stkPaint.setFilterBitmap(true);
             canv.drawText(route_number, x, y, stkPaint);
+
             return bm;
         }
 
