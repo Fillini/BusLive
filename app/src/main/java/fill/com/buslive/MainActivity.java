@@ -48,6 +48,10 @@ import material.MaterialProgressBar;
 //TODO: Если SlidingPanel expanded и перевернуть телефон, то toolbar перекрывает его (Исправить)
 
 //TODO: Сделать что то с drag_view. Убрать эту уродскую стрелочку
+
+
+//TODO: Вывести по клику на остановку маршруты автобусов, которые проходят здесь
+
 public class MainActivity extends GatewaedActivity {
 
 
@@ -130,6 +134,7 @@ public class MainActivity extends GatewaedActivity {
             periodicGateway.startGetBusses(checkedRoute);
         }
         if (routes != null) {
+
             //route_view.setRoutes(routes);
         }
 
@@ -137,10 +142,7 @@ public class MainActivity extends GatewaedActivity {
 
 
     public void onEvent(CheckRouteEvent event){
-
-
         setCheckedRoute(event.getChecked_route());
-
     }
 
 
@@ -241,9 +243,16 @@ public class MainActivity extends GatewaedActivity {
         bus_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                gateway.getRoutes(spHelper.getCity());
-                sliding_layout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
-                progress_bar.setVisibility(View.VISIBLE);
+                if(routes==null){
+                    gateway.getRoutes(spHelper.getCity());
+                    progress_bar.setVisibility(View.VISIBLE);
+                    sliding_layout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+                }else{
+                    sliding_layout.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
+                }
+
+
+
             }
         });
 
@@ -269,7 +278,7 @@ public class MainActivity extends GatewaedActivity {
             @Override
             public void onPanelExpanded(View panel) {
                 int id = chevron_iv.getTag() == null ? -1 : Integer.parseInt(chevron_iv.getTag().toString());
-                if(id==R.drawable.ic_chevron_double_down){
+                if (id == R.drawable.ic_chevron_double_down) {
                     chevron_iv.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_chevron_double_up));
                     chevron_iv.setTag(R.drawable.ic_chevron_double_up);
                     Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.chevron_anim);
@@ -282,7 +291,7 @@ public class MainActivity extends GatewaedActivity {
             @Override
             public void onPanelAnchored(View panel) {
                 int id = chevron_iv.getTag() == null ? -1 : Integer.parseInt(chevron_iv.getTag().toString());
-                if(id==R.drawable.ic_chevron_double_down){
+                if (id == R.drawable.ic_chevron_double_down) {
                     chevron_iv.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_chevron_double_up));
                     chevron_iv.setTag(R.drawable.ic_chevron_double_up);
                     Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.chevron_anim);

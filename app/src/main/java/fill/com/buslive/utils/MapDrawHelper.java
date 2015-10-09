@@ -13,6 +13,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.AsyncTask;
+import android.os.Handler;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptor;
@@ -44,8 +45,6 @@ import fill.com.buslive.http.pojo.Stations;
 public class MapDrawHelper {
 
 
-
-
     enum CIRCLE_MODE{
         CIRCLE,ARROW_CIRCLE
     }
@@ -64,12 +63,9 @@ public class MapDrawHelper {
     Context context;
 
 
-
-
     int display_width;
 
     int[] colors;
-
 
     float currentZoom;
 
@@ -118,8 +114,8 @@ public class MapDrawHelper {
      * Метод отрисовывает на карте маршруты
      */
     public void drawRoutes(ArrayList<Routes.Route> checkedRoute) {
-        busDrawer.clearAllMarkers();  /*отчищаем все автобусы*/
         routeDrawer.setCheckedRoute(checkedRoute);
+        busDrawer.clearAllMarkers();  /*отчищаем все автобусы*/
         routeDrawer.draw();
     }
 
@@ -130,6 +126,16 @@ public class MapDrawHelper {
     public void drawBusses( Busses busses){
         busDrawer.setBusses(busses);
         busDrawer.draw();
+
+        AsyncTask task = new AsyncTask() {
+            @Override
+            protected Object doInBackground(Object[] objects) {
+                busDrawer.draw();
+                return null;
+            }
+        };
+        task.execute();
+
     }
 
     /**
@@ -138,26 +144,19 @@ public class MapDrawHelper {
      */
     public void drawStations(Stations stations){
         stationDrawer.setStations(stations);
-        stationDrawer.draw();
+
+        AsyncTask task = new AsyncTask() {
+            @Override
+            protected Object doInBackground(Object[] objects) {
+                stationDrawer.draw();
+                return null;
+            }
+        };
+
+        task.execute();
+
+
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -498,7 +497,6 @@ public class MapDrawHelper {
 
         public void draw(){
             clearAllStations();
-
             if(currentZoom>=STATION_ZOOM_THRESHOLD){
                 Bitmap station_bitmap = createSmallStationBitmap();
                 BitmapDescriptor descriptor = BitmapDescriptorFactory.fromBitmap(station_bitmap);

@@ -6,6 +6,7 @@ import android.util.Log;
  * Logging
  * Usage:
  *      L.trace(object);
+ *      L.trace(object, ERR);
  */
 public class L {
 

@@ -45,9 +45,7 @@ public class RoutesComponent extends LinearLayout {
     ListView list;
     Context context;
     LayoutInflater inflater;
-
     Routes routes;
-
     OnCheckRouteListener onCheckRouteListener;
 
     ArrayList<Routes.Route> checkedset = new ArrayList<>();
@@ -225,10 +223,10 @@ public class RoutesComponent extends LinearLayout {
 
             BitmapDrawable drawable = (BitmapDrawable) ContextCompat.getDrawable(context, R.drawable.bus_number_icon);
             Bitmap bitmap = drawable.getBitmap();
-            Bitmap scalable = Bitmap.createScaledBitmap(bitmap, 200, 100, false);
+            Bitmap scalable = Bitmap.createScaledBitmap(bitmap, 100, 50, false);
 
 
-            Bitmap bm = Bitmap.createBitmap(200, 100, Bitmap.Config.ARGB_8888);
+            Bitmap bm = Bitmap.createBitmap(100, 50, Bitmap.Config.ARGB_8888);
             canv = new Canvas(bm);
             canv.drawBitmap(scalable, 0, 0, new Paint());
 
@@ -256,7 +254,7 @@ public class RoutesComponent extends LinearLayout {
             Paint stkPaint = new Paint();
             stkPaint.setStyle(Paint.Style.STROKE);
             stkPaint.setTextSize(textSize);
-            stkPaint.setStrokeWidth(3);
+            stkPaint.setStrokeWidth(2);
             stkPaint.setColor(Color.WHITE);
             stkPaint.setAntiAlias(true);
             stkPaint.setFilterBitmap(true);
