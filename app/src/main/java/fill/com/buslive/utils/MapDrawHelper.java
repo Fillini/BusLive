@@ -79,10 +79,6 @@ public class MapDrawHelper {
 
 
 
-
-
-
-
     public MapDrawHelper(GoogleMap map, Context context) {
         this.map = map;
         this.context = context;

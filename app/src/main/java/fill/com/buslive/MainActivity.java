@@ -414,9 +414,6 @@ public class MainActivity extends GatewaedActivity {
                 }
             }
 
-            //progress_bar.setVisibility(View.GONE);
-            //sliding_layout.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
-
             /* для плавности запускаем немного позже, после того как фрагмент добавится*/
             Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
@@ -425,7 +422,7 @@ public class MainActivity extends GatewaedActivity {
                     progress_bar.setVisibility(View.GONE);
                     sliding_layout.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
                 }
-            }, 300);
+            }, 500);
 
         }
 
