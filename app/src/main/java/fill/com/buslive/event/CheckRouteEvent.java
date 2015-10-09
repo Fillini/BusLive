@@ -12,7 +12,6 @@ public class CheckRouteEvent {
 
     ArrayList<Routes.Route> checked_route;
 
-    long time = System.currentTimeMillis();
 
 
     public ArrayList<Routes.Route> getChecked_route() {
@@ -23,7 +22,5 @@ public class CheckRouteEvent {
         this.checked_route = checked_route;
     }
 
-    public long getTime(){
-        return time;
-    }
+
 }

@@ -33,7 +33,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 
+import de.greenrobot.event.EventBus;
 import fill.com.buslive.R;
+import fill.com.buslive.event.ClickStationEvent;
 import fill.com.buslive.http.pojo.Busses;
 import fill.com.buslive.http.pojo.Routes;
 import fill.com.buslive.http.pojo.Stations;
@@ -75,6 +77,10 @@ public class MapDrawHelper {
 
 
 
+    EventBus eventbus = EventBus.getDefault();
+
+
+
     public MapDrawHelper(GoogleMap map, Context context) {
         this.map = map;
         this.context = context;
@@ -102,6 +108,14 @@ public class MapDrawHelper {
         map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
+                for(Map<String,Object> map: stationDrawer.getDrawed_station()){
+                    if(map.containsValue(marker)){
+                        Stations.Station station = ((Stations.Station) map.get("station"));
+                        ClickStationEvent clickStationEvent = new ClickStationEvent();
+                        clickStationEvent.setStation(station);
+                        eventbus.post(clickStationEvent);
+                    }
+                }
                 return true;
             }
         });
@@ -144,18 +158,7 @@ public class MapDrawHelper {
      */
     public void drawStations(Stations stations){
         stationDrawer.setStations(stations);
-
-        AsyncTask task = new AsyncTask() {
-            @Override
-            protected Object doInBackground(Object[] objects) {
-                stationDrawer.draw();
-                return null;
-            }
-        };
-
-        task.execute();
-
-
+        stationDrawer.draw();
     }
 
 
@@ -495,6 +498,14 @@ public class MapDrawHelper {
             return this.stations;
         }
 
+        public ArrayList<Map<String, Object>> getDrawed_station() {
+            return drawed_station;
+        }
+
+        public void setDrawed_station(ArrayList<Map<String, Object>> drawed_station) {
+            this.drawed_station = drawed_station;
+        }
+
         public void draw(){
             clearAllStations();
             if(currentZoom>=STATION_ZOOM_THRESHOLD){
@@ -513,7 +524,8 @@ public class MapDrawHelper {
                         op.icon(descriptor);
                         Marker marker = map.addMarker(op);
                         Map<String, Object> map = new HashMap<>();
-                        map.put("station", marker);
+                        map.put("marker", marker);
+                        map.put("station", station);
                         drawed_station.add(map);
                     }
                 }
@@ -522,7 +534,7 @@ public class MapDrawHelper {
 
         private void clearAllStations(){
             for (int i = 0; i < drawed_station.size(); i++) {
-                Marker marker = ((Marker) drawed_station.get(i).get("station"));
+                Marker marker = ((Marker) drawed_station.get(i).get("marker"));
                 marker.remove();
             }
             drawed_station.clear();

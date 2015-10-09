@@ -30,6 +30,7 @@ import java.util.ArrayList;
 
 import de.greenrobot.event.EventBus;
 import fill.com.buslive.event.CheckRouteEvent;
+import fill.com.buslive.event.ClickStationEvent;
 import fill.com.buslive.fragments.RoutesFragment;
 import fill.com.buslive.fragments.views.RoutesComponent;
 import fill.com.buslive.http.pojo.AbstractPOJO;
@@ -143,6 +144,13 @@ public class MainActivity extends GatewaedActivity {
 
     public void onEvent(CheckRouteEvent event){
         setCheckedRoute(event.getChecked_route());
+    }
+
+    public void onEvent(ClickStationEvent event){
+
+       // L.trace(System.currentTimeMillis()-event.getStart());
+
+        //L.trace(event.getStation().getName());
     }
 
 
