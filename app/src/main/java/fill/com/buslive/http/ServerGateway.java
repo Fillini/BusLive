@@ -15,6 +15,7 @@ import fill.com.buslive.http.pojo.AbstractPOJO;
 import fill.com.buslive.http.pojo.Busses;
 import fill.com.buslive.http.pojo.Cities;
 import fill.com.buslive.http.pojo.Countries;
+import fill.com.buslive.http.pojo.RouteStations;
 import fill.com.buslive.http.pojo.Routes;
 import fill.com.buslive.http.pojo.Stations;
 import fill.com.buslive.utils.L;
@@ -148,7 +149,7 @@ public class ServerGateway extends Gateway {
         Call<Stations>  getStations(@Path("city_id") String city_id);
 
         @GET(ROUTESTATIONS_PREFIX)
-        Call<Stations>  getRouteStations(@Path("city_id") String city_id);
+        Call<RouteStations>  getRouteStations(@Path("city_id") String city_id);
 
 
         @GET(BUSSES_PREFIX)

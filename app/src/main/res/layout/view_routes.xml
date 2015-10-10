@@ -14,8 +14,10 @@
     android:scrollbars="none"
     android:overScrollMode="never"
     android:listSelector="@drawable/list_selector"
+    android:divider="@null"
+    android:background="#fff8f8"
     >
-
+    <!--android:background="#fff8f8"-->
 </ListView>
 
 

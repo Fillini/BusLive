@@ -10,6 +10,7 @@ import com.google.gson.JsonParseException;
 import java.lang.reflect.Type;
 
 import fill.com.buslive.http.pojo.Stations;
+import fill.com.buslive.utils.L;
 import fill.com.buslive.utils.LatLon;
 
 /**
@@ -28,7 +29,7 @@ public class StationsDeserializer implements JsonDeserializer<Stations> {
 
             Stations.Station station = new Stations.Station();
             station.setCityId(jsonObject.get("cityId").getAsString());
-            station.setName(jsonObject.get("name").getAsString());
+            station.setName( jsonObject.get("name").isJsonNull()? "" :jsonObject.get("name").getAsString());
             station.setId(jsonObject.get("id").getAsString());
 
             LatLon latlon = new LatLon(Float.valueOf(jsonObject.get("lat").getAsFloat()), Float.valueOf(jsonObject.get("lon").getAsFloat()));

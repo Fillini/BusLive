@@ -63,7 +63,7 @@
                 android:id="@+id/dragView"
                 android:layout_width="match_parent"
                 android:layout_height="?android:attr/actionBarSize"
-                android:background="#fafafa"
+                android:background="#eaeaea"
                 android:orientation="horizontal">
 
                 <material.MaterialProgressBar

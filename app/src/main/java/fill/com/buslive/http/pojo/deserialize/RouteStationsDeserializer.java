@@ -23,10 +23,10 @@ public class RouteStationsDeserializer implements JsonDeserializer<RouteStations
         for(JsonElement el: array){
             JsonObject obj = el.getAsJsonObject();
             RouteStations.RouteStation routeStation = new RouteStations.RouteStation();
-            int sequenceNumber = obj.get("sequenceNumber").getAsInt();
-            int routeId = obj.get("routeId").getAsInt();
-            int stationId = obj.get("stationId").getAsInt();
-            int cityId = obj.get("cityId").getAsInt();
+            String sequenceNumber = obj.get("sequenceNumber").getAsString();
+            String routeId = obj.get("routeId").getAsString();
+            String stationId = obj.get("stationId").getAsString();
+            String cityId = obj.get("cityId").getAsString();
             boolean directionForward = obj.get("directionForward").getAsBoolean();
             routeStation.setSequenceNumber(sequenceNumber);
             routeStation.setRouteId(routeId);

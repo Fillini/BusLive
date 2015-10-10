@@ -31,41 +31,41 @@ public class RouteStations implements AbstractPOJO {
 
     public static class RouteStation implements AbstractPOJO{
 
-        int sequenceNumber;
-        int routeId;
-        int stationId;
-        int cityId;
+        String sequenceNumber;
+        String routeId;
+        String stationId;
+        String cityId;
         boolean directionForward;
 
-        public int getSequenceNumber() {
+        public String getSequenceNumber() {
             return sequenceNumber;
         }
 
-        public void setSequenceNumber(int sequenceNumber) {
+        public void setSequenceNumber(String sequenceNumber) {
             this.sequenceNumber = sequenceNumber;
         }
 
-        public int getRouteId() {
+        public String getRouteId() {
             return routeId;
         }
 
-        public void setRouteId(int routeId) {
+        public void setRouteId(String routeId) {
             this.routeId = routeId;
         }
 
-        public int getStationId() {
+        public String getStationId() {
             return stationId;
         }
 
-        public void setStationId(int stationId) {
+        public void setStationId(String stationId) {
             this.stationId = stationId;
         }
 
-        public int getCityId() {
+        public String getCityId() {
             return cityId;
         }
 
-        public void setCityId(int cityId) {
+        public void setCityId(String cityId) {
             this.cityId = cityId;
         }
 

@@ -59,8 +59,12 @@ public class RoutesFragment extends Fragment {
             routes_component = (RoutesComponent)LayoutInflater.from(getContext()).inflate(R.layout.fragment_routes_list, container, false);
         }
 
-        routes = ((Routes) getArguments().getSerializable(ROUTES_PARAM));
-        checkedRoutes = ((ArrayList) getArguments().getSerializable(CHECKED_ROUTES_PARAM));
+        if(routes==null){
+            routes = ((Routes) getArguments().getSerializable(ROUTES_PARAM));
+        }
+        if(checkedRoutes==null){
+            checkedRoutes = ((ArrayList) getArguments().getSerializable(CHECKED_ROUTES_PARAM));
+        }
 
         routes_component.setRoutes(routes);
         routes_component.setCheckedset(checkedRoutes);
@@ -77,10 +81,19 @@ public class RoutesFragment extends Fragment {
         return routes_component;
     }
 
+    public void setRoutes(Routes routes, ArrayList<Routes.Route> checkedRoutes){
+
+        this.routes = routes;
+        this.checkedRoutes = checkedRoutes;
+
+
+
+    }
+
 
 
     public void onEvent(Object event){
-        //L.trace("event");
+
     }
 
     @Override
