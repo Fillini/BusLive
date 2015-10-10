@@ -8,6 +8,8 @@ import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.widget.ImageView;
 
+import fill.com.buslive.utils.L;
+
 /**
  * Created by Fill on 10.10.2015.
  */
@@ -38,6 +40,7 @@ public class BusNumberView extends ImageView {
         super.onDraw(canvas);
 
         canvas.getClipBounds(clip_rect);
+
         float textSize = new Float(clip_rect.width()/2.2);
         if(route_number.length()>3){
             textSize /= 1.3;
@@ -51,7 +54,7 @@ public class BusNumberView extends ImageView {
 
         textPaint.getTextBounds(route_number, 0, route_number.length(), bounds);
         int x = (clip_rect.width() / 2) - (bounds.width() / 2) - (route_number.length() / 2);
-        float y = (clip_rect.width() / 2) - (bounds.height() / 2) - textPaint.descent() - textPaint.ascent();
+        float y = (clip_rect.height() / 2) - (bounds.height() / 2) - textPaint.descent() - textPaint.ascent();
         canvas.drawText(route_number, x, y, textPaint);
 
         stkPaint.setStyle(Paint.Style.STROKE);
