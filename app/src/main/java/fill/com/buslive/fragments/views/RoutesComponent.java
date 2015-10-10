@@ -152,7 +152,7 @@ public class RoutesComponent extends LinearLayout {
                 v_h = new ViewHolder();
                 v_h.begin_station_tv = (TextView) convertView.findViewById(R.id.begin_station_tv);
                 v_h.end_station_tv = (TextView) convertView.findViewById(R.id.end_station_tv);
-                v_h.bus_icon_iv = (ImageView) convertView.findViewById(R.id.bus_icon_iv);
+                v_h.bus_icon_iv = (BusNumberView) convertView.findViewById(R.id.bus_icon_iv);
                 v_h.text = (CheckedTextView) convertView.findViewById(android.R.id.text1);
                 convertView.setTag(v_h);
             } else {
@@ -168,7 +168,7 @@ public class RoutesComponent extends LinearLayout {
 
             TextView begin_station_tv = v_h.begin_station_tv;
             TextView end_station_tv = v_h.end_station_tv;
-            ImageView bus_icon_iv = v_h.bus_icon_iv;
+            BusNumberView bus_icon_iv = v_h.bus_icon_iv;
             CheckedTextView text = v_h.text;
 
             if (splitter_route.length >= 2) {
@@ -180,9 +180,10 @@ public class RoutesComponent extends LinearLayout {
 
             text.setCheckMarkDrawable(R.drawable.check_mark);
 
-            AsyncBitmapCreate asyncBitmapCreate = new AsyncBitmapCreate(bus_icon_iv, getContext());
-            asyncBitmapCreate.executeOnExecutor(service,route_number);
+            /*AsyncBitmapCreate asyncBitmapCreate = new AsyncBitmapCreate(bus_icon_iv, getContext());
+            asyncBitmapCreate.executeOnExecutor(service,route_number);*/
 
+            bus_icon_iv.setRoute_number(route_number);
 
             if (checkedset.contains(routes.get(position))) {
                 text.setChecked(true);
@@ -197,7 +198,7 @@ public class RoutesComponent extends LinearLayout {
     public static class ViewHolder {
         TextView begin_station_tv;
         TextView end_station_tv;
-        ImageView bus_icon_iv;
+        BusNumberView bus_icon_iv;
         CheckedTextView text;
     }
 
@@ -220,6 +221,8 @@ public class RoutesComponent extends LinearLayout {
 
         @Override
         protected Bitmap doInBackground(String... params) {
+
+            long start = System.nanoTime();
 
             BitmapDrawable drawable = (BitmapDrawable) ContextCompat.getDrawable(context, R.drawable.bus_number_icon);
             Bitmap bitmap = drawable.getBitmap();
@@ -259,6 +262,8 @@ public class RoutesComponent extends LinearLayout {
             stkPaint.setAntiAlias(true);
             stkPaint.setFilterBitmap(true);
             canv.drawText(route_number, x, y, stkPaint);
+
+            L.trace(System.nanoTime()-start);
 
             return bm;
         }
