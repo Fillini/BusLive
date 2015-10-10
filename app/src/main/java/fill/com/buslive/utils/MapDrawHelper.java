@@ -141,15 +141,6 @@ public class MapDrawHelper {
         busDrawer.setBusses(busses);
         busDrawer.draw();
 
-        AsyncTask task = new AsyncTask() {
-            @Override
-            protected Object doInBackground(Object[] objects) {
-                busDrawer.draw();
-                return null;
-            }
-        };
-        task.execute();
-
     }
 
     /**

@@ -18,6 +18,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -51,6 +52,7 @@ import material.MaterialProgressBar;
 
 //TODO: Сделать что то с drag_view. Убрать эту уродскую стрелочку
 
+//TODO: Сделать сплэш экран
 
 public class MainActivity extends GatewaedActivity {
 
@@ -63,6 +65,8 @@ public class MainActivity extends GatewaedActivity {
     ImageButton bus_btn;
     Toolbar toolbar;
     ImageView chevron_iv;
+    ImageView ic_back;
+    TextView route_tv;
 
     RoutesComponent route_view;
 
@@ -106,6 +110,8 @@ public class MainActivity extends GatewaedActivity {
         route_view = (RoutesComponent) findViewById(R.id.route_view);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         chevron_iv = (ImageView) findViewById(R.id.chevron_iv);
+        ic_back = (ImageView) findViewById(R.id.ic_back);
+        route_tv = (TextView) findViewById(R.id.route_tv);
         slide_container = (LinearLayout)findViewById(R.id.slide_container);
 
         setSupportActionBar(toolbar);
@@ -115,12 +121,15 @@ public class MainActivity extends GatewaedActivity {
         adjustMap();
         setListeners();
 
-
-
         progress_bar.setColorSchemeColors(getResources().getIntArray(R.array.routecolors));
-        progress_bar.setVisibility(View.GONE);
 
         sliding_layout.setAnchorPoint(0.5f);
+
+        progress_bar.setVisibility(View.GONE);
+        ic_back.setAlpha(0.0f);
+        route_tv.setAlpha(0.0f);
+
+
 
         if (!spHelper.isSettingsExists()) {
             Intent intent = new Intent(this, SettingsActivity.class);
@@ -132,15 +141,17 @@ public class MainActivity extends GatewaedActivity {
         }
 
         if (checkedRoute != null) {
-            //route_view.setCheckedset(checkedRoute);
             periodicGateway.startGetBusses(checkedRoute);
         }
         if (routes == null) {
+            progress_bar.setVisibility(View.VISIBLE);
             gateway.getRoutes(spHelper.getCity());
         }
         if(routeStations==null){
             gateway.getRouteStations(spHelper.getCity());
         }
+
+
     }
 
 
@@ -283,11 +294,11 @@ public class MainActivity extends GatewaedActivity {
         bus_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(routes==null){
+                if (routes == null) {
                     gateway.getRoutes(spHelper.getCity());
                     progress_bar.setVisibility(View.VISIBLE);
                     sliding_layout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
-                }else{
+                } else {
                     sliding_layout.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
                     setRoutesOnRouteFragment(routes, checkedRoute);
                 }
@@ -303,40 +314,43 @@ public class MainActivity extends GatewaedActivity {
                     toolbar_offset = 0.0f;
                 }
                 toolbar.setTranslationY(-1 * toolbar_offset * 2);
+
+
+                if (slideOffset <= sliding_layout.getAnchorPoint()) {
+                    chevron_iv.setRotation(slideOffset * -360);
+                    chevron_iv.setAlpha(1.0f);
+                    ic_back.setAlpha(0.0f);
+                    route_tv.setAlpha(0.0f);
+                }
+
+                if (slideOffset > sliding_layout.getAnchorPoint()) {
+                    chevron_iv.setAlpha((1.0f - slideOffset) * 2);
+
+                    float alpha_in = (-0.5f+slideOffset)*2;
+
+                    ic_back.setAlpha(alpha_in);
+                    route_tv.setAlpha(alpha_in);
+                    route_tv.setTranslationX(alpha_in*-30);
+
+                }
+
+
             }
 
             @Override
             public void onPanelCollapsed(View panel) {
-                chevron_iv.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_chevron_double_down));
-                chevron_iv.setTag(R.drawable.ic_chevron_double_down);
-                Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.chevron_anim);
-                animation.setFillAfter(true);
-                chevron_iv.startAnimation(animation);
+
             }
 
             @Override
             public void onPanelExpanded(View panel) {
-                int id = chevron_iv.getTag() == null ? -1 : Integer.parseInt(chevron_iv.getTag().toString());
-                if (id == R.drawable.ic_chevron_double_down) {
-                    chevron_iv.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_chevron_double_up));
-                    chevron_iv.setTag(R.drawable.ic_chevron_double_up);
-                    Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.chevron_anim);
-                    animation.setFillAfter(true);
-                    chevron_iv.startAnimation(animation);
-                }
+
 
             }
 
             @Override
             public void onPanelAnchored(View panel) {
-                int id = chevron_iv.getTag() == null ? -1 : Integer.parseInt(chevron_iv.getTag().toString());
-                if (id == R.drawable.ic_chevron_double_down) {
-                    chevron_iv.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_chevron_double_up));
-                    chevron_iv.setTag(R.drawable.ic_chevron_double_up);
-                    Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.chevron_anim);
-                    animation.setFillAfter(true);
-                    chevron_iv.startAnimation(animation);
-                }
+
             }
 
             @Override
@@ -451,15 +465,18 @@ public class MainActivity extends GatewaedActivity {
 
             setRoutesOnRouteFragment(this.routes, checkedRoute);
 
+            progress_bar.setVisibility(View.GONE);
+            sliding_layout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+
             /* для плавности запускаем немного позже, после того как фрагмент добавится*/
-            Handler handler = new Handler();
+           /* Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     progress_bar.setVisibility(View.GONE);
                     sliding_layout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
                 }
-            }, 500);
+            }, 500);*/
 
         }
 
