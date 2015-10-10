@@ -43,12 +43,11 @@ public class BusNumberView extends ImageView {
             textSize /= 1.3;
         }
 
-
         textPaint.setTextSize(textSize);
         textPaint.setAntiAlias(true);
         textPaint.setColor(Color.BLACK);
         textPaint.setFilterBitmap(true);
-
+        textPaint.setFlags(Paint.EMBEDDED_BITMAP_TEXT_FLAG);
 
         textPaint.getTextBounds(route_number, 0, route_number.length(), bounds);
         int x = (clip_rect.width() / 2) - (bounds.width() / 2) - (route_number.length() / 2);

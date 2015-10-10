@@ -39,6 +39,8 @@ public class ServerGateway extends Gateway {
     public static final String ROUTES_PREFIX = "/cities/{city_id}/routes/";
     public static final String STATIONS_PREFIX = "/cities/{city_id}/stations/";
     public static final String BUSSES_PREFIX = "/cities/{city_id}/routes/{route_id}/busses";
+    public static final String ROUTESTATIONS_PREFIX = "/cities/{city_id}/routestations";
+
 
 
 
@@ -99,6 +101,12 @@ public class ServerGateway extends Gateway {
     }
 
 
+
+    public void getRouteStations(String city_id){
+        executeCallback(service.getRouteStations(city_id));
+    }
+
+
     /**
      * Возвращает список автобусов по идентификатору маршрута
      * @param city_id - - идентификатор города
@@ -138,6 +146,9 @@ public class ServerGateway extends Gateway {
 
         @GET(STATIONS_PREFIX)
         Call<Stations>  getStations(@Path("city_id") String city_id);
+
+        @GET(ROUTESTATIONS_PREFIX)
+        Call<Stations>  getRouteStations(@Path("city_id") String city_id);
 
 
         @GET(BUSSES_PREFIX)
