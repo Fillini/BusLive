@@ -52,8 +52,6 @@ import material.MaterialProgressBar;
 //TODO: Сделать что то с drag_view. Убрать эту уродскую стрелочку
 
 
-//TODO: Вывести по клику на остановку маршруты автобусов, которые проходят здесь
-
 public class MainActivity extends GatewaedActivity {
 
 
@@ -280,7 +278,7 @@ public class MainActivity extends GatewaedActivity {
     }
 
 
-    //TODO: Сделать когда нажимаем на кнопку чтоб во фрагменте отображались все маршруты
+
     private void setListeners() {
         bus_btn.setOnClickListener(new View.OnClickListener() {
             @Override
