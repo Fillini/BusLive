@@ -48,9 +48,6 @@ import material.MaterialProgressBar;
 
 //TODO: Сделать напоминалку (типа будильник, заводишь на определенное время, на определенный автобус)
 
-//TODO: Если SlidingPanel expanded и перевернуть телефон, то toolbar перекрывает его (Исправить)
-
-//TODO: Сделать что то с drag_view. Убрать эту уродскую стрелочку
 
 //TODO: Сделать сплэш экран
 
@@ -90,10 +87,14 @@ public class MainActivity extends GatewaedActivity {
     static final String ROUTES_KEY = "routes"; /* все маршруты*/
     static final String STATIONS_KEY = "stations"; /* все остановки*/
     static final String ROUTESTATIONS_KEY = "routestations"; /* все остановки*/
+
     static final String CURRENT_ZOOM_MAP_KEY = "current_zoom_key";
     static final String CURRENT_LAT_LNG_KEY = "current_lat_lng_key";
+    static final String SLIDING_STATE_KEY = "sliding_state_key";
+
     private float current_zoom = 12;
     private LatLng current_latlng = new LatLng(51.154191, 71.416905); // astana coords
+    private String current_sliding_state;
 
 
     @Override
@@ -125,9 +126,14 @@ public class MainActivity extends GatewaedActivity {
 
         sliding_layout.setAnchorPoint(0.5f);
 
+
+
         progress_bar.setVisibility(View.GONE);
         ic_back.setAlpha(0.0f);
         route_tv.setAlpha(0.0f);
+
+
+
 
 
 
@@ -139,6 +145,9 @@ public class MainActivity extends GatewaedActivity {
         if (savedInstanceState != null) {
             restoreFromSavedInstance(savedInstanceState);
         }
+
+
+        restoreSlidingPanelState();
 
         if (checkedRoute != null) {
             periodicGateway.startGetBusses(checkedRoute);
@@ -196,23 +205,7 @@ public class MainActivity extends GatewaedActivity {
 
 
 
-    /**
-     * Сохраняем выбранные маршруты, актуальный зум, актуальные координаты
-     *
-     * @param savedInstanceState
-     */
-    private void restoreFromSavedInstance(Bundle savedInstanceState) {
-        checkedRoute = ((ArrayList) savedInstanceState.getSerializable(CHECKED_ROUTES_KEY));
-        routes = (Routes) savedInstanceState.getSerializable(ROUTES_KEY);
-        stations = (Stations) savedInstanceState.getSerializable(STATIONS_KEY);
-        routeStations = (RouteStations)savedInstanceState.getSerializable(ROUTESTATIONS_KEY);
 
-        if(savedInstanceState.getParcelable(CURRENT_LAT_LNG_KEY)!=null){
-            current_latlng = savedInstanceState.getParcelable(CURRENT_LAT_LNG_KEY);
-            current_zoom = savedInstanceState.getFloat(CURRENT_ZOOM_MAP_KEY);
-        }
-
-    }
 
 
     private void adjustMap() {
@@ -317,7 +310,7 @@ public class MainActivity extends GatewaedActivity {
 
 
                 if (slideOffset <= sliding_layout.getAnchorPoint()) {
-                    chevron_iv.setRotation(slideOffset * -360);
+                    chevron_iv.setRotation(slideOffset * -180*2);
                     chevron_iv.setAlpha(1.0f);
                     ic_back.setAlpha(0.0f);
                     route_tv.setAlpha(0.0f);
@@ -326,14 +319,13 @@ public class MainActivity extends GatewaedActivity {
                 if (slideOffset > sliding_layout.getAnchorPoint()) {
                     chevron_iv.setAlpha((1.0f - slideOffset) * 2);
 
-                    float alpha_in = (-0.5f+slideOffset)*2;
+                    float alpha_in = (-0.5f + slideOffset) * 2;
 
                     ic_back.setAlpha(alpha_in);
                     route_tv.setAlpha(alpha_in);
-                    route_tv.setTranslationX(alpha_in*-30);
+                    route_tv.setTranslationX(alpha_in * -30);
 
                 }
-
 
             }
 
@@ -360,6 +352,55 @@ public class MainActivity extends GatewaedActivity {
         });
     }
 
+
+    private void restoreSlidingPanelState(){
+
+        if(current_sliding_state==null){
+            progress_bar.setVisibility(View.GONE);
+            ic_back.setAlpha(0.0f);
+            route_tv.setAlpha(0.0f);
+            return;
+        }
+        if(current_sliding_state.equals(SlidingUpPanelLayout.PanelState.COLLAPSED.toString())){
+
+            chevron_iv.setRotation(0);
+            chevron_iv.setAlpha(1.0f);
+            ic_back.setAlpha(0.0f);
+            route_tv.setAlpha(0.0f);
+
+            return;
+        }
+        if(current_sliding_state.equals(SlidingUpPanelLayout.PanelState.ANCHORED.toString())){
+            TypedValue tv = new TypedValue();
+            if (getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
+                int actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data, getResources().getDisplayMetrics());
+                toolbar.setTranslationY(-1 * actionBarHeight * 2);
+            }
+            chevron_iv.setRotation(180);
+            chevron_iv.setAlpha(1.0f);
+            ic_back.setAlpha(0.0f);
+            route_tv.setAlpha(0.0f);
+
+            return;
+        }
+        if(current_sliding_state.equals(SlidingUpPanelLayout.PanelState.EXPANDED.toString())){
+            TypedValue tv = new TypedValue();
+            if (getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
+                int actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data, getResources().getDisplayMetrics());
+                toolbar.setTranslationY(-1 * actionBarHeight * 2);
+            }
+            chevron_iv.setRotation(180);
+            chevron_iv.setAlpha(0.0f);
+            ic_back.setAlpha(1.0f);
+            route_tv.setAlpha(1.0f);
+            route_tv.setTranslationX(-1.0f*40);
+
+            return;
+        }
+
+
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
@@ -380,10 +421,29 @@ public class MainActivity extends GatewaedActivity {
         outState.putSerializable(ROUTES_KEY, routes);
         outState.putSerializable(STATIONS_KEY, stations);
         outState.putSerializable(ROUTESTATIONS_KEY, routeStations);
+        outState.putString(SLIDING_STATE_KEY, sliding_layout.getPanelState().toString());
         if(map!=null){
             outState.putFloat(CURRENT_ZOOM_MAP_KEY, map.getCameraPosition().zoom);
             outState.putParcelable(CURRENT_LAT_LNG_KEY, map.getCameraPosition().target);
         }
+    }
+
+    /**
+     * Сохраняем выбранные маршруты, актуальный зум, актуальные координаты
+     *
+     * @param savedInstanceState
+     */
+    private void restoreFromSavedInstance(Bundle savedInstanceState) {
+        checkedRoute = ((ArrayList) savedInstanceState.getSerializable(CHECKED_ROUTES_KEY));
+        routes = (Routes) savedInstanceState.getSerializable(ROUTES_KEY);
+        stations = (Stations) savedInstanceState.getSerializable(STATIONS_KEY);
+        routeStations = (RouteStations)savedInstanceState.getSerializable(ROUTESTATIONS_KEY);
+        current_sliding_state = savedInstanceState.getString(SLIDING_STATE_KEY);
+        if(savedInstanceState.getParcelable(CURRENT_LAT_LNG_KEY)!=null){
+            current_latlng = savedInstanceState.getParcelable(CURRENT_LAT_LNG_KEY);
+            current_zoom = savedInstanceState.getFloat(CURRENT_ZOOM_MAP_KEY);
+        }
+
     }
 
     @Override
