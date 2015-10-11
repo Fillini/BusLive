@@ -592,6 +592,17 @@ public class MainActivity extends GatewaedActivity {
 
 
     @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (routes == null) {
+            gateway.getRoutes(spHelper.getCity());
+            progress_bar.setVisibility(View.VISIBLE);
+            sliding_layout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+        }
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         eventbus.unregister(this);
