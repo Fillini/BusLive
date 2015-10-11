@@ -2,18 +2,14 @@ package fill.com.buslive;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -41,7 +37,6 @@ import fill.com.buslive.http.pojo.RouteStations;
 import fill.com.buslive.http.pojo.Routes;
 
 import fill.com.buslive.http.pojo.Stations;
-import fill.com.buslive.utils.L;
 import fill.com.buslive.utils.MapDrawHelper;
 import material.MaterialProgressBar;
 
@@ -63,7 +58,7 @@ public class MainActivity extends GatewaedActivity {
     Toolbar toolbar;
     ImageView chevron_iv;
     ImageView ic_back;
-    TextView route_tv;
+    TextView sliding_title_tv;
 
     RoutesComponent route_view;
 
@@ -112,7 +107,7 @@ public class MainActivity extends GatewaedActivity {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         chevron_iv = (ImageView) findViewById(R.id.chevron_iv);
         ic_back = (ImageView) findViewById(R.id.ic_back);
-        route_tv = (TextView) findViewById(R.id.route_tv);
+        sliding_title_tv = (TextView) findViewById(R.id.route_tv);
         slide_container = (LinearLayout)findViewById(R.id.slide_container);
 
         setSupportActionBar(toolbar);
@@ -130,7 +125,7 @@ public class MainActivity extends GatewaedActivity {
 
         progress_bar.setVisibility(View.GONE);
         ic_back.setAlpha(0.0f);
-        route_tv.setAlpha(0.0f);
+        sliding_title_tv.setAlpha(0.0f);
 
 
 
@@ -199,6 +194,7 @@ public class MainActivity extends GatewaedActivity {
         setRoutesOnRouteFragment(routes_on_station, new ArrayList<Routes.Route>());
 
         sliding_layout.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
+        sliding_title_tv.setText(station.getName());
 
 
     }
@@ -294,6 +290,7 @@ public class MainActivity extends GatewaedActivity {
                 } else {
                     sliding_layout.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
                     setRoutesOnRouteFragment(routes, checkedRoute);
+                    sliding_title_tv.setText("Маршруты");
                 }
 
             }
@@ -313,7 +310,7 @@ public class MainActivity extends GatewaedActivity {
                     chevron_iv.setRotation(slideOffset * -180*2);
                     chevron_iv.setAlpha(1.0f);
                     ic_back.setAlpha(0.0f);
-                    route_tv.setAlpha(0.0f);
+                    sliding_title_tv.setAlpha(0.0f);
                 }
 
                 if (slideOffset > sliding_layout.getAnchorPoint()) {
@@ -322,8 +319,8 @@ public class MainActivity extends GatewaedActivity {
                     float alpha_in = (-0.5f + slideOffset) * 2;
 
                     ic_back.setAlpha(alpha_in);
-                    route_tv.setAlpha(alpha_in);
-                    route_tv.setTranslationX(alpha_in * -30);
+                    sliding_title_tv.setAlpha(alpha_in);
+                    sliding_title_tv.setTranslationX(alpha_in * -30);
 
                 }
 
@@ -358,7 +355,7 @@ public class MainActivity extends GatewaedActivity {
         if(current_sliding_state==null){
             progress_bar.setVisibility(View.GONE);
             ic_back.setAlpha(0.0f);
-            route_tv.setAlpha(0.0f);
+            sliding_title_tv.setAlpha(0.0f);
             return;
         }
         if(current_sliding_state.equals(SlidingUpPanelLayout.PanelState.COLLAPSED.toString())){
@@ -366,7 +363,7 @@ public class MainActivity extends GatewaedActivity {
             chevron_iv.setRotation(0);
             chevron_iv.setAlpha(1.0f);
             ic_back.setAlpha(0.0f);
-            route_tv.setAlpha(0.0f);
+            sliding_title_tv.setAlpha(0.0f);
 
             return;
         }
@@ -379,7 +376,7 @@ public class MainActivity extends GatewaedActivity {
             chevron_iv.setRotation(180);
             chevron_iv.setAlpha(1.0f);
             ic_back.setAlpha(0.0f);
-            route_tv.setAlpha(0.0f);
+            sliding_title_tv.setAlpha(0.0f);
 
             return;
         }
@@ -392,8 +389,8 @@ public class MainActivity extends GatewaedActivity {
             chevron_iv.setRotation(180);
             chevron_iv.setAlpha(0.0f);
             ic_back.setAlpha(1.0f);
-            route_tv.setAlpha(1.0f);
-            route_tv.setTranslationX(-1.0f*40);
+            sliding_title_tv.setAlpha(1.0f);
+            sliding_title_tv.setTranslationX(-1.0f * 40);
 
             return;
         }
@@ -527,6 +524,7 @@ public class MainActivity extends GatewaedActivity {
 
             progress_bar.setVisibility(View.GONE);
             sliding_layout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+            sliding_title_tv.setText("Маршруты");
 
             /* для плавности запускаем немного позже, после того как фрагмент добавится*/
            /* Handler handler = new Handler();

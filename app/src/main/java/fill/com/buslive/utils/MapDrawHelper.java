@@ -80,7 +80,7 @@ public class MapDrawHelper {
     EventBus eventbus = EventBus.getDefault();
 
 
-
+    //TODO: Сделать что то с z-sorting
     public MapDrawHelper(GoogleMap map, Context context) {
         this.map = map;
         this.context = context;
