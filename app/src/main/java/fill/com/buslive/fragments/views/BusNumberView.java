@@ -1,11 +1,13 @@
 package fill.com.buslive.fragments.views;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
+import android.view.animation.Animation;
 import android.widget.ImageView;
 
 import fill.com.buslive.utils.L;
@@ -64,6 +66,8 @@ public class BusNumberView extends ImageView {
         stkPaint.setAntiAlias(true);
         stkPaint.setFilterBitmap(true);
         canvas.drawText(route_number, x, y, stkPaint);
+
+
 
     }
 }
