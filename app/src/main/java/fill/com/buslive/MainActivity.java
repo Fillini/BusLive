@@ -44,7 +44,7 @@ import material.MaterialProgressBar;
 //TODO: Сделать напоминалку (типа будильник, заводишь на определенное время, на определенный автобус)
 
 
-//TODO: Сделать сплэш экран
+//TODO: Сделать сплэш экран с индикацией загрузки контента.
 
 public class MainActivity extends GatewaedActivity {
 
