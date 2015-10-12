@@ -8,49 +8,36 @@ import android.support.v7.widget.SearchView;
 import android.view.Menu;
 
 import android.view.MenuItem;
+import android.widget.ImageView;
+
+import fill.com.buslive.fragments.views.DottedProgressBar;
 
 
 public class StationActivity extends AppCompatActivity {
 
 
+    ImageView animation_iv;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_station);
+
+        animation_iv = (ImageView)findViewById(R.id.animation_iv);
+
+
+        DottedProgressBar dottedProgressBar = new DottedProgressBar();
+        animation_iv.setImageDrawable(dottedProgressBar);
+        dottedProgressBar.start();
+
+
+
     }
 
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-
-        getMenuInflater().inflate(R.menu.menu_station, menu);
-        MenuItem searchItem = menu.findItem(R.id.action_search);
-        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                // perform query here
-                return true;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                return false;
-            }
-        });
-
-        return super.onCreateOptionsMenu(menu);
-    }
-
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        return super.onOptionsItemSelected(item);
     }
 
 }

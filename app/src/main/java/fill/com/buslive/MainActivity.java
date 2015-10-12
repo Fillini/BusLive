@@ -46,6 +46,14 @@ import material.MaterialProgressBar;
 
 //TODO: Сделать сплэш экран с индикацией загрузки контента.
 
+
+
+//TODO: Реализовать  //http://infobus.kz/cities/13/stations/137/prediction   //http://infobus.kz/cities/13/stations/137/routesatstation
+
+
+
+
+
 public class MainActivity extends GatewaedActivity {
 
 
@@ -154,6 +162,10 @@ public class MainActivity extends GatewaedActivity {
         if(routeStations==null){
             gateway.getRouteStations(spHelper.getCity());
         }
+
+
+
+
 
 
     }
