@@ -115,16 +115,7 @@ public class RoutesComponent extends LinearLayout {
 
     public class RoutesAdapter extends BaseAdapter {
 
-
-
-        Bitmap bm;
-        Canvas canv;
-        Bitmap scalable;
-
-
         public RoutesAdapter() {
-
-
 
         }
 
@@ -180,9 +171,6 @@ public class RoutesComponent extends LinearLayout {
 
             text.setCheckMarkDrawable(R.drawable.check_mark);
 
-            /*AsyncBitmapCreate asyncBitmapCreate = new AsyncBitmapCreate(bus_icon_iv, getContext());
-            asyncBitmapCreate.executeOnExecutor(service,route_number);*/
-
             bus_icon_iv.setRoute_number(route_number);
 
             if (checkedset.contains(routes.get(position))) {
@@ -206,75 +194,6 @@ public class RoutesComponent extends LinearLayout {
     public interface OnCheckRouteListener {
         void onCheckRoute(ArrayList<Routes.Route> checkedRoutes);
     }
-
-    public static class AsyncBitmapCreate extends AsyncTask<String, Void, Bitmap>{
-
-
-        Canvas canv;
-        ImageView bus_icon_iv;
-        Context context;
-
-        public AsyncBitmapCreate(ImageView bus_icon_iv, Context context ) {
-            this.bus_icon_iv = bus_icon_iv;
-            this.context = context;
-        }
-
-        @Override
-        protected Bitmap doInBackground(String... params) {
-
-            long start = System.nanoTime();
-
-            BitmapDrawable drawable = (BitmapDrawable) ContextCompat.getDrawable(context, R.drawable.bus_number_icon);
-            Bitmap bitmap = drawable.getBitmap();
-            Bitmap scalable = Bitmap.createScaledBitmap(bitmap, 100, 50, false);
-
-
-            Bitmap bm = Bitmap.createBitmap(100, 50, Bitmap.Config.ARGB_8888);
-            canv = new Canvas(bm);
-            canv.drawBitmap(scalable, 0, 0, new Paint());
-
-            String route_number = params[0];
-
-            /**
-             * Ширина текста 1/2 от базовой
-             */
-            float textSize = new Float(bm.getWidth()/2.2);
-            if(route_number.length()>3){
-                textSize /= 1.3;
-            }
-
-            Paint textPaint = new Paint();
-            textPaint.setTextSize(textSize);
-            textPaint.setAntiAlias(true);
-            textPaint.setFilterBitmap(true);
-
-            Rect bounds = new Rect();
-            textPaint.getTextBounds(route_number, 0, route_number.length(), bounds);
-            int x = (canv.getWidth() / 2) - (bounds.width() / 2) - (route_number.length() / 2);
-            float y = (canv.getHeight() / 2) - (bounds.height() / 2) - textPaint.descent() - textPaint.ascent();
-            canv.drawText(route_number, x, y, textPaint);
-
-            Paint stkPaint = new Paint();
-            stkPaint.setStyle(Paint.Style.STROKE);
-            stkPaint.setTextSize(textSize);
-            stkPaint.setStrokeWidth(2);
-            stkPaint.setColor(Color.WHITE);
-            stkPaint.setAntiAlias(true);
-            stkPaint.setFilterBitmap(true);
-            canv.drawText(route_number, x, y, stkPaint);
-
-            L.trace(System.nanoTime()-start);
-
-            return bm;
-        }
-
-        @Override
-        protected void onPostExecute(Bitmap bitmap) {
-            super.onPostExecute(bitmap);
-            bus_icon_iv.setImageBitmap(bitmap);
-        }
-    }
-
 
 
 

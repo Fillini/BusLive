@@ -1,5 +1,6 @@
 package fill.com.buslive;
 
+import android.animation.Animator;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -10,6 +11,8 @@ import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewAnimationUtils;
+import android.view.ViewTreeObserver;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -36,7 +39,9 @@ import fill.com.buslive.http.pojo.Geocode;
 import fill.com.buslive.http.pojo.RouteStations;
 import fill.com.buslive.http.pojo.Routes;
 
+import fill.com.buslive.http.pojo.RoutesOnStations;
 import fill.com.buslive.http.pojo.Stations;
+import fill.com.buslive.utils.L;
 import fill.com.buslive.utils.MapDrawHelper;
 import material.MaterialProgressBar;
 
@@ -45,7 +50,6 @@ import material.MaterialProgressBar;
 
 
 //TODO: Сделать сплэш экран с индикацией загрузки контента.
-
 
 
 //TODO: Реализовать  //http://infobus.kz/cities/13/stations/137/prediction   //http://infobus.kz/cities/13/stations/137/routesatstation
@@ -67,6 +71,7 @@ public class MainActivity extends GatewaedActivity {
     ImageView chevron_iv;
     ImageView ic_back;
     TextView sliding_title_tv;
+    RelativeLayout root_layout;
 
     RoutesComponent route_view;
 
@@ -137,9 +142,6 @@ public class MainActivity extends GatewaedActivity {
 
 
 
-
-
-
         if (!spHelper.isSettingsExists()) {
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivityForResult(intent, SETTINGS_RESULT);
@@ -165,10 +167,10 @@ public class MainActivity extends GatewaedActivity {
 
 
 
-
-
-
     }
+
+
+
 
 
     public void onEvent(CheckRouteEvent event){
@@ -176,39 +178,10 @@ public class MainActivity extends GatewaedActivity {
     }
 
     public void onEvent(ClickStationEvent event){
-
         Stations.Station station = event.getStation();
-        Routes routes_on_station = new Routes();
-
-        ArrayList<String> route_ids = new ArrayList<>();
-
-        String station_id = station.getId();
-
-
-        for(RouteStations.RouteStation routestation: routeStations.getRouteStations()){
-
-            if(routestation.getStationId().equals(station_id)){
-                String route_id = routestation.getRouteId();
-                route_ids.add(route_id);
-            }
-        }
-
-
-        for(Routes.Route route: routes.getRoutes()){
-
-            for(String route_id: route_ids){
-                if(route_id.equals(route.getBusreportRouteId())){
-                    routes_on_station.addRoute(route);
-                }
-            }
-        }
-
-        setRoutesOnRouteFragment(routes_on_station, new ArrayList<Routes.Route>());
-
-        sliding_layout.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
+        gateway.getRoutesOnStations(spHelper.getCity(), station.getId());
+        progress_bar.setVisibility(View.VISIBLE);
         sliding_title_tv.setText(station.getName());
-
-
     }
 
 
@@ -327,13 +300,10 @@ public class MainActivity extends GatewaedActivity {
 
                 if (slideOffset > sliding_layout.getAnchorPoint()) {
                     chevron_iv.setAlpha((1.0f - slideOffset) * 2);
-
                     float alpha_in = (-0.5f + slideOffset) * 2;
-
                     ic_back.setAlpha(alpha_in);
                     sliding_title_tv.setAlpha(alpha_in);
                     sliding_title_tv.setTranslationX(alpha_in * -30);
-
                 }
 
             }
@@ -459,6 +429,8 @@ public class MainActivity extends GatewaedActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_bus_live, menu);
         return super.onCreateOptionsMenu(menu);
+
+
     }
 
 
@@ -520,6 +492,22 @@ public class MainActivity extends GatewaedActivity {
         if(response instanceof Stations){
             Stations stations = (Stations)response;
             mapDrawHelper.drawStations(stations);
+        }
+        if(response instanceof RoutesOnStations){
+            progress_bar.setVisibility(View.GONE);
+            RoutesOnStations routes_ids = (RoutesOnStations)response;
+            Routes routes_on_station = new Routes();
+
+            for(Routes.Route route: routes.getRoutes()){
+                for(Integer route_id: routes_ids.getRoutes_on_stations()){
+                    String s = route_id+"";
+                    if(s.equals(route.getBusreportRouteId())){
+                        routes_on_station.addRoute(route);
+                    }
+                }
+            }
+            setRoutesOnRouteFragment(routes_on_station, new ArrayList<Routes.Route>());
+            sliding_layout.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
         }
 
         if(response instanceof RouteStations){

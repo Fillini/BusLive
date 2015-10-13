@@ -7,6 +7,7 @@ import com.squareup.okhttp.Cache;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import fill.com.buslive.R;
@@ -17,6 +18,7 @@ import fill.com.buslive.http.pojo.Cities;
 import fill.com.buslive.http.pojo.Countries;
 import fill.com.buslive.http.pojo.RouteStations;
 import fill.com.buslive.http.pojo.Routes;
+import fill.com.buslive.http.pojo.RoutesOnStations;
 import fill.com.buslive.http.pojo.Stations;
 import fill.com.buslive.utils.L;
 import retrofit.Call;
@@ -41,6 +43,7 @@ public class ServerGateway extends Gateway {
     public static final String STATIONS_PREFIX = "/cities/{city_id}/stations/";
     public static final String BUSSES_PREFIX = "/cities/{city_id}/routes/{route_id}/busses";
     public static final String ROUTESTATIONS_PREFIX = "/cities/{city_id}/routestations";
+    public static final String ROUTES_ON_STATIONS_PREFIX = "/cities/{city_id}/stations/{station_id}/routesatstation";
 
 
 
@@ -117,6 +120,12 @@ public class ServerGateway extends Gateway {
         executeCallback(service.getBusses(city_id, busreportRouteId));
     }
 
+
+    public void getRoutesOnStations(String city_id, String station_id){
+        executeCallback(service.getRoutesOnStations(city_id, station_id));
+    }
+
+
     private <T extends AbstractPOJO> void executeCallback(Call<T> call){
 
         call.enqueue(new Callback<T>() {
@@ -132,7 +141,6 @@ public class ServerGateway extends Gateway {
             }
         });
     }
-
 
     public interface BusliveService{
         @GET(COUNTRIES_PREFIX)
@@ -154,6 +162,13 @@ public class ServerGateway extends Gateway {
 
         @GET(BUSSES_PREFIX)
         Call<Busses> getBusses(@Path("city_id") String city_id, @Path("route_id") String busreportRouteId);
+
+        /**
+         *  Выводит маршруты проходящие на данной остановке
+          * @return
+         */
+        @GET(ROUTES_ON_STATIONS_PREFIX)
+        Call<RoutesOnStations> getRoutesOnStations(@Path("city_id") String city_id, @Path("station_id") String station_id);
     }
 
 }

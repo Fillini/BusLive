@@ -67,7 +67,5 @@ public class BusNumberView extends ImageView {
         stkPaint.setFilterBitmap(true);
         canvas.drawText(route_number, x, y, stkPaint);
 
-
-
     }
 }
