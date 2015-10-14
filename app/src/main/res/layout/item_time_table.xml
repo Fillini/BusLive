@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+
+    android:elevation="1dp"
+    card_view:cardElevation="1dp"
+    card_view:cardUseCompatPadding="true"
+    card_view:cardCornerRadius="2dp">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_gravity="center"
+        android:layout_margin="5dp"
+        android:weightSum="10"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <fill.com.buslive.fragments.views.BusNumberView
+            android:src="@drawable/bus_number_icon"
+            android:id="@+id/bus_icon_iv"
+            android:layout_margin="5dp"
+            android:layout_gravity="center"
+            android:layout_weight="1.5"
+            android:layout_width="0dp"
+            android:layout_height="match_parent" />
+
+        <ImageView
+            android:layout_margin="5dp"
+            android:layout_gravity="center"
+            android:layout_weight="1.5"
+            android:src="@drawable/route_station"
+            android:layout_width="0dp"
+            android:layout_height="match_parent" />
+
+
+
+
+        <LinearLayout
+            android:layout_gravity="center"
+            android:orientation="vertical"
+            android:layout_weight="5.5"
+            android:layout_width="0dp"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:textSize="13sp"
+                android:layout_marginTop="5dp"
+                android:textColor="#FF33B5E5"
+                android:id="@+id/begin_station_tv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:textSize="13sp"
+                android:layout_marginTop="5dp"
+                android:textColor="#FF33B5E5"
+                android:id="@+id/end_station_tv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+
+        </LinearLayout>
+
+
+        <CheckedTextView
+            android:textSize="13sp"
+            android:layout_gravity="center"
+            android:layout_weight="1.5"
+            android:id="@android:id/text1"
+            android:layout_width="0dp"
+            android:layout_height="?android:attr/listPreferredItemHeightSmall"
+            android:textAppearance="?android:attr/textAppearanceListItemSmall"
+            android:checkMark="?android:attr/listChoiceIndicatorMultiple"
+            android:gravity="center_vertical"
+            android:layout_marginRight="10dp"
+            />
+    </LinearLayout>
+
+</android.support.v7.widget.CardView>

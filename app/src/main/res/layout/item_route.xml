@@ -18,8 +18,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-
-
     <fill.com.buslive.fragments.views.BusNumberView
         android:src="@drawable/bus_number_icon"
         android:id="@+id/bus_icon_iv"

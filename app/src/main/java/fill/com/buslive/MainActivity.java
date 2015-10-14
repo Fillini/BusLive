@@ -2,6 +2,7 @@ package fill.com.buslive;
 
 import android.animation.Animator;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
@@ -13,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.ViewTreeObserver;
+import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -32,6 +34,7 @@ import de.greenrobot.event.EventBus;
 import fill.com.buslive.event.CheckRouteEvent;
 import fill.com.buslive.event.ClickStationEvent;
 import fill.com.buslive.fragments.RoutesFragment;
+import fill.com.buslive.fragments.TimeTableFragment;
 import fill.com.buslive.fragments.views.RoutesComponent;
 import fill.com.buslive.http.pojo.AbstractPOJO;
 import fill.com.buslive.http.pojo.Busses;
@@ -55,7 +58,7 @@ import material.MaterialProgressBar;
 //TODO: Реализовать  //http://infobus.kz/cities/13/stations/137/prediction   //http://infobus.kz/cities/13/stations/137/routesatstation
 
 
-
+//TODO: Реализовать паттерн state
 
 
 public class MainActivity extends GatewaedActivity {
@@ -110,6 +113,8 @@ public class MainActivity extends GatewaedActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+
         eventbus.register(this);
         sliding_layout = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
         slideView = (LinearLayout) findViewById(R.id.slideView);
@@ -135,12 +140,9 @@ public class MainActivity extends GatewaedActivity {
         sliding_layout.setAnchorPoint(0.5f);
 
 
-
         progress_bar.setVisibility(View.GONE);
         ic_back.setAlpha(0.0f);
         sliding_title_tv.setAlpha(0.0f);
-
-
 
         if (!spHelper.isSettingsExists()) {
             Intent intent = new Intent(this, SettingsActivity.class);
@@ -168,9 +170,6 @@ public class MainActivity extends GatewaedActivity {
 
 
     }
-
-
-
 
 
     public void onEvent(CheckRouteEvent event){
@@ -496,17 +495,18 @@ public class MainActivity extends GatewaedActivity {
         if(response instanceof RoutesOnStations){
             progress_bar.setVisibility(View.GONE);
             RoutesOnStations routes_ids = (RoutesOnStations)response;
-            Routes routes_on_station = new Routes();
+            ArrayList<Routes.Route> routes_on_station = new ArrayList<>();
 
             for(Routes.Route route: routes.getRoutes()){
                 for(Integer route_id: routes_ids.getRoutes_on_stations()){
                     String s = route_id+"";
                     if(s.equals(route.getBusreportRouteId())){
-                        routes_on_station.addRoute(route);
+                        routes_on_station.add(route);
                     }
                 }
             }
-            setRoutesOnRouteFragment(routes_on_station, new ArrayList<Routes.Route>());
+
+            setTimeTableFragment(routes_on_station);
             sliding_layout.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
         }
 
@@ -525,17 +525,6 @@ public class MainActivity extends GatewaedActivity {
             progress_bar.setVisibility(View.GONE);
             sliding_layout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
             sliding_title_tv.setText("Маршруты");
-
-            /* для плавности запускаем немного позже, после того как фрагмент добавится*/
-           /* Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    progress_bar.setVisibility(View.GONE);
-                    sliding_layout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
-                }
-            }, 500);*/
-
         }
 
     }
@@ -556,6 +545,15 @@ public class MainActivity extends GatewaedActivity {
 
     }
 
+    private void setTimeTableFragment(ArrayList<Routes.Route> routes_on_station){
+        TimeTableFragment fragment = findTimeTableFragment();
+        if(fragment!=null){
+            fragment.set_routes_on_station(routes_on_station);
+        }else{
+            throw new RuntimeException("TimeTableFragment is null");
+        }
+    }
+
 
 
     private RoutesFragment findRoutesFragment(){
@@ -565,6 +563,30 @@ public class MainActivity extends GatewaedActivity {
         if(mFragment==null){
             FragmentTransaction ft = fm.beginTransaction();
             RoutesFragment fragment = RoutesFragment.newInstance(this.routes, checkedRoute);
+            ft.replace(R.id.slide_container, fragment, null);
+            try {
+                ft.commit();
+                return fragment;
+            }catch (IllegalStateException e){
+                return null;
+            }
+        }else{
+            if(mFragment.isInLayout()){
+                return mFragment;
+            }
+        }
+
+        return null;
+
+    }
+
+
+    private TimeTableFragment findTimeTableFragment(){
+        FragmentManager fm = getSupportFragmentManager();
+        TimeTableFragment mFragment = (TimeTableFragment)fm.findFragmentByTag(TimeTableFragment.TAG);
+        if(mFragment==null){
+            FragmentTransaction ft = fm.beginTransaction();
+            TimeTableFragment fragment = new TimeTableFragment();
             ft.replace(R.id.slide_container, fragment, null);
             try {
                 ft.commit();

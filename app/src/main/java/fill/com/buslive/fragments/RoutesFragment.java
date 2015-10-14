@@ -53,8 +53,6 @@ public class RoutesFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        eventBus.register(this);
-
         if(routes_component==null){
             routes_component = (RoutesComponent)LayoutInflater.from(getContext()).inflate(R.layout.fragment_routes_list, container, false);
         }
@@ -90,11 +88,6 @@ public class RoutesFragment extends Fragment {
 
     }
 
-
-
-    public void onEvent(Object event){
-
-    }
 
     @Override
     public void onDestroy() {

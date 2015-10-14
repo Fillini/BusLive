@@ -137,7 +137,6 @@ public class RoutesComponent extends LinearLayout {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             ViewHolder v_h;
-
             if (convertView == null) {
                 convertView = inflater.inflate(R.layout.item_route, parent, false);
                 v_h = new ViewHolder();
