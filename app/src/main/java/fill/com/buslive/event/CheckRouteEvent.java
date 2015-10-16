@@ -10,15 +10,15 @@ import fill.com.buslive.http.pojo.Routes;
 public class CheckRouteEvent {
 
 
-    ArrayList<Routes.Route> checked_route;
+    Routes checked_route;
 
 
 
-    public ArrayList<Routes.Route> getChecked_route() {
+    public Routes getChecked_route() {
         return checked_route;
     }
 
-    public void setChecked_route(ArrayList<Routes.Route> checked_route) {
+    public void setChecked_route(Routes checked_route) {
         this.checked_route = checked_route;
     }
 

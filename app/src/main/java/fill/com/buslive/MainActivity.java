@@ -79,7 +79,7 @@ public class MainActivity extends GatewaedActivity {
 
     MaterialProgressBar progress_bar;
 
-    ArrayList<Routes.Route> checkedRoute;
+    Routes checkedRoute;
     Routes routes;
     Stations stations;
     RouteStations routeStations;
@@ -165,8 +165,6 @@ public class MainActivity extends GatewaedActivity {
             gateway.getRouteStations(spHelper.getCity());
         }
 
-
-
     }
 
 
@@ -195,7 +193,6 @@ public class MainActivity extends GatewaedActivity {
                 map.getUiSettings().setCompassEnabled(true);
 
                 solveLocation();
-
 
                 TypedValue tv = new TypedValue();
                 if (getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
@@ -406,7 +403,7 @@ public class MainActivity extends GatewaedActivity {
      * @param savedInstanceState
      */
     private void restoreFromSavedInstance(Bundle savedInstanceState) {
-        checkedRoute = ((ArrayList) savedInstanceState.getSerializable(CHECKED_ROUTES_KEY));
+        checkedRoute = (Routes) savedInstanceState.getSerializable(CHECKED_ROUTES_KEY);
         routes = (Routes) savedInstanceState.getSerializable(ROUTES_KEY);
         stations = (Stations) savedInstanceState.getSerializable(STATIONS_KEY);
         routeStations = (RouteStations)savedInstanceState.getSerializable(ROUTESTATIONS_KEY);
@@ -443,7 +440,7 @@ public class MainActivity extends GatewaedActivity {
      *
      * @param checkedRoute - выбраные маршруты
      */
-    public void setCheckedRoute(ArrayList<Routes.Route> checkedRoute) {
+    public void setCheckedRoute(Routes checkedRoute) {
         this.checkedRoute = checkedRoute;
         if (this.checkedRoute != null && this.checkedRoute.size()>0) {
             periodicGateway.startGetBusses(this.checkedRoute);
@@ -509,7 +506,7 @@ public class MainActivity extends GatewaedActivity {
 
         if (response instanceof Routes) {
             this.routes = (Routes) response;
-            checkedRoute = new ArrayList<>();
+            checkedRoute = new Routes();
             setCheckedRoute(checkedRoute);
 
             setRoutesOnRouteFragment(this.routes, checkedRoute);
@@ -527,7 +524,7 @@ public class MainActivity extends GatewaedActivity {
      * @param routes маршруты которые в списке
      * @param checkedRoute отмеченые маршруты (если надо)
      */
-    private void setRoutesOnRouteFragment(Routes routes, ArrayList<Routes.Route> checkedRoute){
+    private void setRoutesOnRouteFragment(Routes routes, Routes checkedRoute){
         RoutesFragment fragment = findRoutesFragment();
         setFragment(fragment, R.id.slide_container);
         if(fragment!=null){

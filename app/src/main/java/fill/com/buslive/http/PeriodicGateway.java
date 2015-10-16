@@ -15,7 +15,7 @@ import fill.com.buslive.utils.L;
 public class PeriodicGateway extends ServerGateway {
 
     /*Выбранные маршруты*/
-    ArrayList<Routes.Route> checkedRoutes = new ArrayList<>();
+    Routes checkedRoutes = new Routes();
 
     /* Период 5 секунд */
     static Integer PERIOD = 5000;
@@ -34,13 +34,13 @@ public class PeriodicGateway extends ServerGateway {
      * Запрос возвращает список автобусов на маршруте
      * @param checkedRoutes
      */
-    public void startGetBusses(final ArrayList<Routes.Route> checkedRoutes){
+    public void startGetBusses(final Routes checkedRoutes){
         this.checkedRoutes = checkedRoutes;
         handler.removeCallbacksAndMessages(null);
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                for (Routes.Route route : checkedRoutes) {
+                for (Routes.Route route : checkedRoutes.getRoutes()) {
                     getBusses(route.getCityId(), route.getBusreportRouteId());
                 }
                 if (!isStop) {
@@ -68,11 +68,9 @@ public class PeriodicGateway extends ServerGateway {
     }
 
     public void addRoute(Routes.Route route){
-        checkedRoutes.add(route);
+        checkedRoutes.addRoute(route);
     }
-    public void removeRoute(Routes.Route route){
-        checkedRoutes.remove(route);
-    }
+
 
     public void destroy(){
         isStop = true;

@@ -127,7 +127,7 @@ public class MapDrawHelper {
     /**
      * Метод отрисовывает на карте маршруты
      */
-    public void drawRoutes(ArrayList<Routes.Route> checkedRoute) {
+    public void drawRoutes(Routes checkedRoute) {
         routeDrawer.setCheckedRoute(checkedRoute);
         busDrawer.clearAllMarkers();  /*отчищаем все автобусы*/
         routeDrawer.draw();
@@ -158,9 +158,9 @@ public class MapDrawHelper {
     public class RouteDrawer{
 
         ArrayList<Map<String, Object>> lines = new ArrayList<>();
-        ArrayList<Routes.Route> checked_route;
+        Routes checked_route;
 
-        public RouteDrawer(ArrayList<Routes.Route> checked_route) {
+        public RouteDrawer(Routes checked_route) {
             this.checked_route = checked_route;
         }
         public RouteDrawer(){
@@ -223,7 +223,7 @@ public class MapDrawHelper {
             }
         }
 
-        public void setCheckedRoute(ArrayList<Routes.Route> checkedRoute) {
+        public void setCheckedRoute(Routes checkedRoute) {
             this.checked_route = checkedRoute;
         }
 

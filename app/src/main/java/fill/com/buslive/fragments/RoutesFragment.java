@@ -33,7 +33,7 @@ public class RoutesFragment extends Fragment {
 
 
     Routes routes;
-    ArrayList<Routes.Route> checkedRoutes;
+    Routes checkedRoutes;
 
 
     public static RoutesFragment newInstance(Routes routes, ArrayList<Routes.Route> checkedRoutes){
@@ -70,7 +70,7 @@ public class RoutesFragment extends Fragment {
 
         routes_component.setOnCheckRouteListener(new RoutesComponent.OnCheckRouteListener() {
             @Override
-            public void onCheckRoute(ArrayList<Routes.Route> checkedRoutes) {
+            public void onCheckRoute(Routes checkedRoutes) {
                 CheckRouteEvent event = new CheckRouteEvent();
                 event.setChecked_route(checkedRoutes);
                 eventBus.post(event);
@@ -82,10 +82,10 @@ public class RoutesFragment extends Fragment {
 
     private void restoreFromSavedState(Bundle savedInstanceState) {
         routes = (Routes) savedInstanceState.getSerializable(ROUTES_PARAM);
-        checkedRoutes = (ArrayList<Routes.Route>) savedInstanceState.getSerializable(CHECKED_ROUTES_PARAM);
+        checkedRoutes = (Routes) savedInstanceState.getSerializable(CHECKED_ROUTES_PARAM);
     }
 
-    public void setRoutes(Routes routes, ArrayList<Routes.Route> checkedRoutes){
+    public void setRoutes(Routes routes, Routes checkedRoutes){
         this.routes = routes;
         this.checkedRoutes = checkedRoutes;
     }

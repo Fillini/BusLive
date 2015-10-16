@@ -50,7 +50,7 @@ public class RoutesComponent extends LinearLayout {
     Routes routes;
     OnCheckRouteListener onCheckRouteListener;
 
-    ArrayList<Routes.Route> checkedset = new ArrayList<>();
+    Routes checkedset = new Routes();
 
     ExecutorService service = Executors.newFixedThreadPool(1);
 
@@ -69,13 +69,13 @@ public class RoutesComponent extends LinearLayout {
         //setListeners();
     }
 
-    public ArrayList<Routes.Route> getCheckedSet() {
+    public Routes getCheckedSet() {
         return checkedset;
     }
 
-    public void setCheckedset(ArrayList<Routes.Route> checkedset) {
+    public void setCheckedset(Routes checkedset) {
         if (checkedset == null) {
-            this.checkedset = new ArrayList<>();
+            this.checkedset = new Routes();
         } else {
             this.checkedset = checkedset;
         }
@@ -88,10 +88,10 @@ public class RoutesComponent extends LinearLayout {
                 SwitchCompat switchCompat = ((SwitchCompat) view.findViewById(R.id.switch_compat));
                 if (switchCompat.isChecked()) {
                     switchCompat.setChecked(false);
-                    checkedset.remove(routes.get(position));
+                    checkedset.getRoutes().remove(routes.get(position));
                 } else {
                     switchCompat.setChecked(true);
-                    checkedset.add(routes.get(position));
+                    checkedset.addRoute(routes.get(position));
                 }
                 if (onCheckRouteListener != null) {
                     onCheckRouteListener.onCheckRoute(checkedset);
@@ -172,7 +172,7 @@ public class RoutesComponent extends LinearLayout {
 
             bus_icon_iv.setRoute_number(route_number);
 
-            if (checkedset.contains(routes.get(position))) {
+            if (checkedset.getRoutes().contains(routes.get(position))) {
                 switch_compat.setChecked(true);
             }else{
                 switch_compat.setChecked(false);
@@ -182,9 +182,9 @@ public class RoutesComponent extends LinearLayout {
                 @Override
                 public void onClick(View v) {
                     if (switch_compat.isChecked()) {
-                        checkedset.add(routes.get(position));
+                        checkedset.addRoute(routes.get(position));
                     } else {
-                        checkedset.remove(routes.get(position));
+                        checkedset.getRoutes().remove(routes.get(position));
                     }
                     if (onCheckRouteListener != null) {
                         onCheckRouteListener.onCheckRoute(checkedset);
@@ -207,7 +207,7 @@ public class RoutesComponent extends LinearLayout {
 
 
     public interface OnCheckRouteListener {
-        void onCheckRoute(ArrayList<Routes.Route> checkedRoutes);
+        void onCheckRoute(Routes checkedRoutes);
     }
 
 
