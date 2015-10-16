@@ -42,8 +42,8 @@ public class TimeTableComponent extends LinearLayout {
         this.context = context;
         setOrientation(LinearLayout.VERTICAL);
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View v = inflater.inflate(R.layout.view_routes, this, true);
-        list = (ListView) v.findViewById(R.id.list);
+        inflater.inflate(R.layout.view_routes, this, true);
+        list = (ListView) findViewById(R.id.list);
         list.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
     }
 

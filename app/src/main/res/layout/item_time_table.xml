@@ -27,21 +27,11 @@
             android:layout_width="0dp"
             android:layout_height="match_parent" />
 
-        <ImageView
-            android:layout_margin="5dp"
-            android:layout_gravity="center"
-            android:layout_weight="1.5"
-            android:src="@drawable/route_station"
-            android:layout_width="0dp"
-            android:layout_height="match_parent" />
-
-
-
 
         <LinearLayout
             android:layout_gravity="center"
             android:orientation="vertical"
-            android:layout_weight="5.5"
+            android:layout_weight="7"
             android:layout_width="0dp"
             android:layout_height="match_parent">
 
@@ -60,7 +50,6 @@
                 android:id="@+id/end_station_tv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
-
 
         </LinearLayout>
 

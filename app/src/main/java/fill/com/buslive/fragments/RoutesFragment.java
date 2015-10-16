@@ -57,15 +57,16 @@ public class RoutesFragment extends Fragment {
             routes_component = (RoutesComponent)LayoutInflater.from(getContext()).inflate(R.layout.fragment_routes_list, container, false);
         }
 
-        if(routes==null){
-            routes = ((Routes) getArguments().getSerializable(ROUTES_PARAM));
-        }
-        if(checkedRoutes==null){
-            checkedRoutes = ((ArrayList) getArguments().getSerializable(CHECKED_ROUTES_PARAM));
+        if(savedInstanceState!=null){
+            restoreFromSavedState(savedInstanceState);
         }
 
-        routes_component.setRoutes(routes);
-        routes_component.setCheckedset(checkedRoutes);
+        if(routes!=null){
+            routes_component.setRoutes(routes);
+        }
+        if(checkedRoutes!=null){
+            routes_component.setCheckedset(checkedRoutes);
+        }
 
         routes_component.setOnCheckRouteListener(new RoutesComponent.OnCheckRouteListener() {
             @Override
@@ -79,15 +80,23 @@ public class RoutesFragment extends Fragment {
         return routes_component;
     }
 
-    public void setRoutes(Routes routes, ArrayList<Routes.Route> checkedRoutes){
-
-        this.routes = routes;
-        this.checkedRoutes = checkedRoutes;
-
-
-
+    private void restoreFromSavedState(Bundle savedInstanceState) {
+        routes = (Routes) savedInstanceState.getSerializable(ROUTES_PARAM);
+        checkedRoutes = (ArrayList<Routes.Route>) savedInstanceState.getSerializable(CHECKED_ROUTES_PARAM);
     }
 
+    public void setRoutes(Routes routes, ArrayList<Routes.Route> checkedRoutes){
+        this.routes = routes;
+        this.checkedRoutes = checkedRoutes;
+    }
+
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable(ROUTES_PARAM, routes);
+        outState.putSerializable(CHECKED_ROUTES_PARAM, checkedRoutes);
+    }
 
     @Override
     public void onDestroy() {

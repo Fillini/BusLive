@@ -23,6 +23,8 @@ public class TimeTableFragment extends Fragment {
 
     TimeTableComponent time_table_component;
 
+    public static final String ROUTES_ON_STATION_PARAM = "routes_on_station_param";
+
 
     ArrayList<Routes.Route> routes_on_station;
 
@@ -33,11 +35,28 @@ public class TimeTableFragment extends Fragment {
         if(time_table_component==null){
             time_table_component = ((TimeTableComponent) LayoutInflater.from(getContext()).inflate(R.layout.fragment_time_table, container, false));
         }
+
+
+        if(savedInstanceState!=null){
+            restoreFromSavedState(savedInstanceState);
+        }
+
         if(routes_on_station!=null){
             time_table_component.setRoutes_on_station(routes_on_station);
         }
 
         return time_table_component;
+    }
+
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable(ROUTES_ON_STATION_PARAM, routes_on_station);
+    }
+
+    private void restoreFromSavedState(Bundle savedInstanceState) {
+        routes_on_station = ((ArrayList<Routes.Route>) savedInstanceState.getSerializable(ROUTES_ON_STATION_PARAM));
     }
 
 

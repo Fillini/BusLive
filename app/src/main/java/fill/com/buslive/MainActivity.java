@@ -74,7 +74,6 @@ public class MainActivity extends GatewaedActivity {
     ImageView chevron_iv;
     ImageView ic_back;
     TextView sliding_title_tv;
-    RelativeLayout root_layout;
 
     RoutesComponent route_view;
 
@@ -182,9 +181,6 @@ public class MainActivity extends GatewaedActivity {
         progress_bar.setVisibility(View.VISIBLE);
         sliding_title_tv.setText(station.getName());
     }
-
-
-
 
 
 
@@ -537,6 +533,7 @@ public class MainActivity extends GatewaedActivity {
      */
     private void setRoutesOnRouteFragment(Routes routes, ArrayList<Routes.Route> checkedRoute){
         RoutesFragment fragment = findRoutesFragment();
+        setFragment(fragment, R.id.slide_container);
         if(fragment!=null){
             fragment.setRoutes(routes, checkedRoute);
         }else{
@@ -547,6 +544,7 @@ public class MainActivity extends GatewaedActivity {
 
     private void setTimeTableFragment(ArrayList<Routes.Route> routes_on_station){
         TimeTableFragment fragment = findTimeTableFragment();
+        setFragment(fragment, R.id.slide_container);
         if(fragment!=null){
             fragment.set_routes_on_station(routes_on_station);
         }else{
@@ -554,53 +552,23 @@ public class MainActivity extends GatewaedActivity {
         }
     }
 
-
-
     private RoutesFragment findRoutesFragment(){
-
-        FragmentManager fm = getSupportFragmentManager();
-        RoutesFragment mFragment = (RoutesFragment)fm.findFragmentByTag(RoutesFragment.TAG);
-        if(mFragment==null){
-            FragmentTransaction ft = fm.beginTransaction();
-            RoutesFragment fragment = RoutesFragment.newInstance(this.routes, checkedRoute);
-            ft.replace(R.id.slide_container, fragment, null);
-            try {
-                ft.commit();
-                return fragment;
-            }catch (IllegalStateException e){
-                return null;
-            }
-        }else{
-            if(mFragment.isInLayout()){
-                return mFragment;
-            }
+        try {
+            return findFragment(RoutesFragment.TAG, RoutesFragment.class);
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
         }
-
-        return null;
-
     }
 
 
     private TimeTableFragment findTimeTableFragment(){
-        FragmentManager fm = getSupportFragmentManager();
-        TimeTableFragment mFragment = (TimeTableFragment)fm.findFragmentByTag(TimeTableFragment.TAG);
-        if(mFragment==null){
-            FragmentTransaction ft = fm.beginTransaction();
-            TimeTableFragment fragment = new TimeTableFragment();
-            ft.replace(R.id.slide_container, fragment, null);
-            try {
-                ft.commit();
-                return fragment;
-            }catch (IllegalStateException e){
-                return null;
-            }
-        }else{
-            if(mFragment.isInLayout()){
-                return mFragment;
-            }
+        try {
+            return findFragment(TimeTableFragment.TAG, TimeTableFragment.class);
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
         }
-
-        return null;
 
     }
 

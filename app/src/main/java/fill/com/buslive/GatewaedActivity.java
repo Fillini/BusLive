@@ -1,8 +1,12 @@
 package fill.com.buslive;
 
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 
+import fill.com.buslive.fragments.RoutesFragment;
 import fill.com.buslive.http.GeocodingGateway;
 import fill.com.buslive.http.PeriodicGateway;
 import fill.com.buslive.http.ResponseCallback;
@@ -45,6 +49,25 @@ public class GatewaedActivity extends AppCompatActivity implements
     protected void onDestroy() {
         super.onDestroy();
         periodicGateway.destroy();
+    }
+
+
+    public <T extends Fragment> T findFragment(String tag, Class<T> type) throws IllegalAccessException, InstantiationException {
+        FragmentManager fm = getSupportFragmentManager();
+        T mFragment = (T)fm.findFragmentByTag(tag);
+        if(mFragment==null){
+            T fragment = type.newInstance();
+            return fragment;
+        }else{
+            return mFragment;
+        }
+    }
+
+    public void setFragment(Fragment fragment, int where){
+        FragmentManager fm = getSupportFragmentManager();
+        FragmentTransaction ft = fm.beginTransaction();
+        ft.replace(where, fragment, null);
+        ft.commit();
     }
 
 
