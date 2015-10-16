@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/tools"
 
     android:elevation="1dp"
     card_view:cardElevation="1dp"
@@ -54,18 +55,19 @@
         </LinearLayout>
 
 
-        <CheckedTextView
-            android:textSize="13sp"
-            android:layout_gravity="center"
+        <android.support.v7.widget.SwitchCompat
             android:layout_weight="1.5"
-            android:id="@android:id/text1"
+            android:id="@+id/switch_compat"
             android:layout_width="0dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginEnd="10dp"
+            android:checked="false"
+            android:text=""
+            android:textOff="OFF"
+            android:textOn="ON"
             android:layout_height="?android:attr/listPreferredItemHeightSmall"
             android:textAppearance="?android:attr/textAppearanceListItemSmall"
-            android:checkMark="?android:attr/listChoiceIndicatorMultiple"
-            android:gravity="center_vertical"
-            android:layout_marginRight="10dp"
-            />
+            app:showText="true"/>
     </LinearLayout>
 
 </android.support.v7.widget.CardView>

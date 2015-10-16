@@ -26,7 +26,7 @@ public class TimeTableFragment extends Fragment {
     public static final String ROUTES_ON_STATION_PARAM = "routes_on_station_param";
 
 
-    ArrayList<Routes.Route> routes_on_station;
+    Routes routes_on_station;
 
     @Nullable
     @Override
@@ -56,11 +56,11 @@ public class TimeTableFragment extends Fragment {
     }
 
     private void restoreFromSavedState(Bundle savedInstanceState) {
-        routes_on_station = ((ArrayList<Routes.Route>) savedInstanceState.getSerializable(ROUTES_ON_STATION_PARAM));
+        routes_on_station = (Routes) savedInstanceState.getSerializable(ROUTES_ON_STATION_PARAM);
     }
 
 
-    public void set_routes_on_station(ArrayList<Routes.Route> routes_on_station){
+    public void set_routes_on_station(Routes routes_on_station){
         this.routes_on_station = routes_on_station;
     }
 

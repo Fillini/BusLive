@@ -91,7 +91,6 @@ public class MainActivity extends GatewaedActivity {
 
     public static final int SETTINGS_RESULT = 1;
     public static final int ROUTES_RESULT = 2;
-    public static final int STATIONS_RESULT = 3;
 
     static final String CHECKED_ROUTES_KEY = "checked_routes"; /* отмеченные маршруты*/
     static final String ROUTES_KEY = "routes"; /* все маршруты*/
@@ -341,7 +340,6 @@ public class MainActivity extends GatewaedActivity {
             chevron_iv.setAlpha(1.0f);
             ic_back.setAlpha(0.0f);
             sliding_title_tv.setAlpha(0.0f);
-
             return;
         }
         if(current_sliding_state.equals(SlidingUpPanelLayout.PanelState.ANCHORED.toString())){
@@ -424,8 +422,6 @@ public class MainActivity extends GatewaedActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_bus_live, menu);
         return super.onCreateOptionsMenu(menu);
-
-
     }
 
 
@@ -491,13 +487,13 @@ public class MainActivity extends GatewaedActivity {
         if(response instanceof RoutesOnStations){
             progress_bar.setVisibility(View.GONE);
             RoutesOnStations routes_ids = (RoutesOnStations)response;
-            ArrayList<Routes.Route> routes_on_station = new ArrayList<>();
+            Routes routes_on_station = new Routes();
 
             for(Routes.Route route: routes.getRoutes()){
                 for(Integer route_id: routes_ids.getRoutes_on_stations()){
                     String s = route_id+"";
                     if(s.equals(route.getBusreportRouteId())){
-                        routes_on_station.add(route);
+                        routes_on_station.addRoute(route);
                     }
                 }
             }
@@ -542,7 +538,7 @@ public class MainActivity extends GatewaedActivity {
 
     }
 
-    private void setTimeTableFragment(ArrayList<Routes.Route> routes_on_station){
+    private void setTimeTableFragment(Routes routes_on_station){
         TimeTableFragment fragment = findTimeTableFragment();
         setFragment(fragment, R.id.slide_container);
         if(fragment!=null){

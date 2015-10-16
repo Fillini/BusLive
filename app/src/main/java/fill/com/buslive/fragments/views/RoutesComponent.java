@@ -10,6 +10,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.media.Image;
 import android.os.AsyncTask;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.SwitchCompat;
 import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -18,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.CheckedTextView;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -63,8 +65,8 @@ public class RoutesComponent extends LinearLayout {
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inflater.inflate(R.layout.view_routes, this, true);
         list = (ListView) findViewById(R.id.list);
-        list.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-        setListeners();
+        //list.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+        //setListeners();
     }
 
     public ArrayList<Routes.Route> getCheckedSet() {
@@ -83,12 +85,12 @@ public class RoutesComponent extends LinearLayout {
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                CheckedTextView textView = ((CheckedTextView) view.findViewById(android.R.id.text1));
-                if (textView.isChecked()) {
-                    textView.setChecked(false);
+                SwitchCompat switchCompat = ((SwitchCompat) view.findViewById(R.id.switch_compat));
+                if (switchCompat.isChecked()) {
+                    switchCompat.setChecked(false);
                     checkedset.remove(routes.get(position));
                 } else {
-                    textView.setChecked(true);
+                    switchCompat.setChecked(true);
                     checkedset.add(routes.get(position));
                 }
                 if (onCheckRouteListener != null) {
@@ -135,7 +137,7 @@ public class RoutesComponent extends LinearLayout {
         }
 
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
+        public View getView(final int position, View convertView, ViewGroup parent) {
             ViewHolder v_h;
             if (convertView == null) {
                 convertView = inflater.inflate(R.layout.item_route, parent, false);
@@ -143,7 +145,7 @@ public class RoutesComponent extends LinearLayout {
                 v_h.begin_station_tv = (TextView) convertView.findViewById(R.id.begin_station_tv);
                 v_h.end_station_tv = (TextView) convertView.findViewById(R.id.end_station_tv);
                 v_h.bus_icon_iv = (BusNumberView) convertView.findViewById(R.id.bus_icon_iv);
-                v_h.text = (CheckedTextView) convertView.findViewById(android.R.id.text1);
+                v_h.switch_compat = (SwitchCompat) convertView.findViewById(R.id.switch_compat);
                 convertView.setTag(v_h);
             } else {
                 v_h = (ViewHolder) convertView.getTag();
@@ -159,24 +161,38 @@ public class RoutesComponent extends LinearLayout {
             TextView begin_station_tv = v_h.begin_station_tv;
             TextView end_station_tv = v_h.end_station_tv;
             BusNumberView bus_icon_iv = v_h.bus_icon_iv;
-            CheckedTextView text = v_h.text;
+            final SwitchCompat switch_compat = v_h.switch_compat;
 
             if (splitter_route.length >= 2) {
                 begin_station_tv.setText(splitter_route[0].trim());
-                end_station_tv.setText(splitter_route[splitter_route.length-1].trim());
+                end_station_tv.setText(splitter_route[splitter_route.length - 1].trim());
             } else {
-                text.setText(routes.get(position).getRouteNumber() + " - " + routes.get(position).getRouteName());
+                switch_compat.setText(routes.get(position).getRouteNumber() + " - " + routes.get(position).getRouteName());
             }
-
-            text.setCheckMarkDrawable(R.drawable.check_mark);
 
             bus_icon_iv.setRoute_number(route_number);
 
             if (checkedset.contains(routes.get(position))) {
-                text.setChecked(true);
+                switch_compat.setChecked(true);
             }else{
-                text.setChecked(false);
+                switch_compat.setChecked(false);
             }
+
+            switch_compat.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (switch_compat.isChecked()) {
+                        checkedset.add(routes.get(position));
+                    } else {
+                        checkedset.remove(routes.get(position));
+                    }
+                    if (onCheckRouteListener != null) {
+                        onCheckRouteListener.onCheckRoute(checkedset);
+                    }
+                }
+            });
+
+
             return convertView;
         }
     }
@@ -186,7 +202,7 @@ public class RoutesComponent extends LinearLayout {
         TextView begin_station_tv;
         TextView end_station_tv;
         BusNumberView bus_icon_iv;
-        CheckedTextView text;
+        SwitchCompat switch_compat;
     }
 
 
