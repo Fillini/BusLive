@@ -341,6 +341,5 @@ public class SettingsActivity extends PreferenceActivity implements ResponseCall
     @Override
     public void onFailure(String message) {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
-
     }
 }
