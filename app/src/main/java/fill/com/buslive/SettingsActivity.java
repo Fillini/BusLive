@@ -7,6 +7,7 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatDelegate;
@@ -224,6 +225,7 @@ public class SettingsActivity extends PreferenceActivity implements ResponseCall
 
     private void showErrorToast(){
         if(!spHelper.isCountryExists()){
+
             Toast.makeText(this, R.string.choose_country_error, Toast.LENGTH_SHORT)
                     .show();
             return;
@@ -339,5 +341,6 @@ public class SettingsActivity extends PreferenceActivity implements ResponseCall
     @Override
     public void onFailure(String message) {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+
     }
 }
