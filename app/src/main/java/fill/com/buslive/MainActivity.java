@@ -2,6 +2,9 @@ package fill.com.buslive;
 
 import android.animation.Animator;
 import android.content.Intent;
+import android.content.res.AssetFileDescriptor;
+import android.location.Location;
+import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -28,6 +31,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import de.greenrobot.event.EventBus;
@@ -45,19 +49,15 @@ import fill.com.buslive.http.pojo.Routes;
 import fill.com.buslive.http.pojo.RoutesOnStations;
 import fill.com.buslive.http.pojo.Stations;
 import fill.com.buslive.utils.L;
+import fill.com.buslive.utils.LocationUtils;
 import fill.com.buslive.utils.MapDrawHelper;
 import material.MaterialProgressBar;
 
 
 //TODO: Сделать напоминалку (типа будильник, заводишь на определенное время, на определенный автобус)
 
-
 //TODO: Сделать сплэш экран с индикацией загрузки контента.
 //TODO: Сделать кнопку ближайшей остановки( появляется только тогда когда пользователь стоит на остановке)
-
-
-
-//TODO: Реализовать  //http://infobus.kz/cities/13/stations/137/prediction   //http://infobus.kz/cities/13/stations/137/routesatstation
 
 
 //TODO: Реализовать паттерн state
@@ -72,6 +72,7 @@ public class MainActivity extends GatewaedActivity {
     SlidingUpPanelLayout sliding_layout;
     LinearLayout slideView;
     ImageButton bus_btn;
+    ImageButton my_station_btn;
     Toolbar toolbar;
     ImageView chevron_iv;
     ImageView ic_back;
@@ -115,11 +116,11 @@ public class MainActivity extends GatewaedActivity {
         setContentView(R.layout.activity_main);
 
 
-
         eventbus.register(this);
         sliding_layout = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
         slideView = (LinearLayout) findViewById(R.id.slideView);
         bus_btn = (ImageButton) findViewById(R.id.bus_btn);
+        my_station_btn = (ImageButton) findViewById(R.id.my_station_btn);
         progress_bar = (MaterialProgressBar) findViewById(R.id.progress_bar);
         progress_bar.setCircleBackgroundEnabled(false);
         route_view = (RoutesComponent) findViewById(R.id.route_view);
@@ -127,7 +128,7 @@ public class MainActivity extends GatewaedActivity {
         chevron_iv = (ImageView) findViewById(R.id.chevron_iv);
         ic_back = (ImageView) findViewById(R.id.ic_back);
         sliding_title_tv = (TextView) findViewById(R.id.route_tv);
-        slide_container = (LinearLayout)findViewById(R.id.slide_container);
+        slide_container = (LinearLayout) findViewById(R.id.slide_container);
 
         setSupportActionBar(toolbar);
 
@@ -142,6 +143,8 @@ public class MainActivity extends GatewaedActivity {
 
 
         progress_bar.setVisibility(View.GONE);
+        my_station_btn.setVisibility(View.GONE);
+
         ic_back.setAlpha(0.0f);
         sliding_title_tv.setAlpha(0.0f);
 
@@ -164,27 +167,25 @@ public class MainActivity extends GatewaedActivity {
             progress_bar.setVisibility(View.VISIBLE);
             gateway.getRoutes(spHelper.getCity());
         }
-        if(routeStations==null){
+        if (routeStations == null) {
             gateway.getRouteStations(spHelper.getCity());
         }
 
     }
 
 
-    public void onEvent(CheckRouteEvent event){
+    public void onEvent(CheckRouteEvent event) {
         setCheckedRoute(event.getChecked_route());
     }
 
 
-
-    public void onEvent(ClickStationEvent event){
+    public void onEvent(ClickStationEvent event) {
         Stations.Station station = event.getStation();
         gateway.getRoutesOnStations(spHelper.getCity(), station.getId());
         progress_bar.setVisibility(View.VISIBLE);
-        sliding_title_tv.setText("Остановка: "+station.getName());
+        sliding_title_tv.setText("Остановка: " + station.getName());
         currentStation_id = station.getId();
     }
-
 
 
     private void adjustMap() {
@@ -193,10 +194,68 @@ public class MainActivity extends GatewaedActivity {
             @Override
             public void onMapReady(GoogleMap googleMap) {
                 map = googleMap;
+                mapDrawHelper = new MapDrawHelper(map, MainActivity.this);
                 map.getUiSettings().setMyLocationButtonEnabled(true);
                 map.getUiSettings().setZoomGesturesEnabled(true);
                 map.getUiSettings().setZoomControlsEnabled(true);
                 map.getUiSettings().setCompassEnabled(true);
+
+                map.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener() {
+                    @Override
+                    public void onMyLocationChange(Location location) {
+
+                        if (stations == null) {
+                            return;
+                        }
+
+                        String closer_station = "0";
+                        String closer_station_name = "";
+
+                        for (Stations.Station station : stations.getStations()) {
+                            LatLng station_location = station.getLatlon().toLatLng();
+                            LatLng my_location = new LatLng(location.getLatitude(), location.getLongitude());
+                            double distance = LocationUtils.distance(station_location, my_location);
+                            if (distance < 20) {
+                                closer_station = station.getId();
+                                closer_station_name = station.getName();
+                            }
+                        }
+
+                        final String selected_station = closer_station;
+                        final String selected_station_name = closer_station_name;
+
+
+                        if (closer_station.equals("0")) {
+                            my_station_btn.setVisibility(View.GONE);
+                        } else {
+                            if(my_station_btn.getVisibility()!=View.VISIBLE){
+                                try {
+                                    MediaPlayer player = new MediaPlayer();
+                                    AssetFileDescriptor afd = getAssets().openFd("notify.mp3");
+                                    player.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+                                    player.prepare();
+                                    player.start();
+                                } catch (Exception e) {}
+                            }
+
+
+                            my_station_btn.setVisibility(View.VISIBLE);
+
+                            my_station_btn.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    gateway.getRoutesOnStations(spHelper.getCity(), selected_station);
+                                    progress_bar.setVisibility(View.VISIBLE);
+                                    sliding_title_tv.setText("Остановка: " + selected_station_name);
+                                    currentStation_id = selected_station;
+                                }
+                            });
+                        }
+
+
+                    }
+                });
+
 
                 solveLocation();
 
@@ -233,7 +292,7 @@ public class MainActivity extends GatewaedActivity {
                 }
                 map.moveCamera(CameraUpdateFactory.zoomTo(current_zoom));
                 map.moveCamera(CameraUpdateFactory.newLatLngZoom(current_latlng, current_zoom));
-                mapDrawHelper = new MapDrawHelper(map, MainActivity.this);
+
                 if (checkedRoute != null) {
                     mapDrawHelper.drawRoutes(checkedRoute);
                 }
@@ -251,14 +310,13 @@ public class MainActivity extends GatewaedActivity {
             String coords = spHelper.getCoords();
             String[] latlng = coords.split(";");
             current_latlng = new LatLng(Double.valueOf(latlng[0]), Double.valueOf(latlng[1]));
-            if(stations!=null){
+            if (stations != null) {
                 mapDrawHelper.drawStations(stations);
-            }else{
+            } else {
                 gateway.getStations(spHelper.getCity());
             }
         }
     }
-
 
 
     private void setListeners() {
@@ -288,7 +346,7 @@ public class MainActivity extends GatewaedActivity {
                 toolbar.setTranslationY(-1 * toolbar_offset * 2);
 
                 if (slideOffset <= sliding_layout.getAnchorPoint()) {
-                    chevron_iv.setRotation(slideOffset * -180*2);
+                    chevron_iv.setRotation(slideOffset * -180 * 2);
                     chevron_iv.setAlpha(1.0f);
                     ic_back.setAlpha(0.0f);
                     sliding_title_tv.setAlpha(0.0f);
@@ -328,15 +386,15 @@ public class MainActivity extends GatewaedActivity {
     }
 
 
-    private void restoreSlidingPanelState(){
+    private void restoreSlidingPanelState() {
 
-        if(current_sliding_state==null){
+        if (current_sliding_state == null) {
             progress_bar.setVisibility(View.GONE);
             ic_back.setAlpha(0.0f);
             sliding_title_tv.setAlpha(0.0f);
             return;
         }
-        if(current_sliding_state.equals(SlidingUpPanelLayout.PanelState.COLLAPSED.toString())){
+        if (current_sliding_state.equals(SlidingUpPanelLayout.PanelState.COLLAPSED.toString())) {
 
             chevron_iv.setRotation(0);
             chevron_iv.setAlpha(1.0f);
@@ -344,7 +402,7 @@ public class MainActivity extends GatewaedActivity {
             sliding_title_tv.setAlpha(0.0f);
             return;
         }
-        if(current_sliding_state.equals(SlidingUpPanelLayout.PanelState.ANCHORED.toString())){
+        if (current_sliding_state.equals(SlidingUpPanelLayout.PanelState.ANCHORED.toString())) {
             TypedValue tv = new TypedValue();
             if (getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
                 int actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data, getResources().getDisplayMetrics());
@@ -357,7 +415,7 @@ public class MainActivity extends GatewaedActivity {
 
             return;
         }
-        if(current_sliding_state.equals(SlidingUpPanelLayout.PanelState.EXPANDED.toString())){
+        if (current_sliding_state.equals(SlidingUpPanelLayout.PanelState.EXPANDED.toString())) {
             TypedValue tv = new TypedValue();
             if (getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
                 int actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data, getResources().getDisplayMetrics());
@@ -396,7 +454,7 @@ public class MainActivity extends GatewaedActivity {
         outState.putSerializable(STATIONS_KEY, stations);
         outState.putSerializable(ROUTESTATIONS_KEY, routeStations);
         outState.putString(SLIDING_STATE_KEY, sliding_layout.getPanelState().toString());
-        if(map!=null){
+        if (map != null) {
             outState.putFloat(CURRENT_ZOOM_MAP_KEY, map.getCameraPosition().zoom);
             outState.putParcelable(CURRENT_LAT_LNG_KEY, map.getCameraPosition().target);
         }
@@ -411,9 +469,9 @@ public class MainActivity extends GatewaedActivity {
         checkedRoute = (Routes) savedInstanceState.getSerializable(CHECKED_ROUTES_KEY);
         routes = (Routes) savedInstanceState.getSerializable(ROUTES_KEY);
         stations = (Stations) savedInstanceState.getSerializable(STATIONS_KEY);
-        routeStations = (RouteStations)savedInstanceState.getSerializable(ROUTESTATIONS_KEY);
+        routeStations = (RouteStations) savedInstanceState.getSerializable(ROUTESTATIONS_KEY);
         current_sliding_state = savedInstanceState.getString(SLIDING_STATE_KEY);
-        if(savedInstanceState.getParcelable(CURRENT_LAT_LNG_KEY)!=null){
+        if (savedInstanceState.getParcelable(CURRENT_LAT_LNG_KEY) != null) {
             current_latlng = savedInstanceState.getParcelable(CURRENT_LAT_LNG_KEY);
             current_zoom = savedInstanceState.getFloat(CURRENT_ZOOM_MAP_KEY);
         }
@@ -447,11 +505,11 @@ public class MainActivity extends GatewaedActivity {
      */
     public void setCheckedRoute(Routes checkedRoute) {
         this.checkedRoute = checkedRoute;
-        if (this.checkedRoute != null && this.checkedRoute.size()>0) {
+        if (this.checkedRoute != null && this.checkedRoute.size() > 0) {
             periodicGateway.startGetBusses(this.checkedRoute);
             mapDrawHelper.drawRoutes(this.checkedRoute);
         }
-        if(this.checkedRoute.size()==0){
+        if (this.checkedRoute.size() == 0) {
             mapDrawHelper.drawRoutes(this.checkedRoute);
         }
     }
@@ -482,19 +540,20 @@ public class MainActivity extends GatewaedActivity {
             Busses busses = (Busses) response;
             mapDrawHelper.drawBusses(busses);
         }
-        if(response instanceof Stations){
-            Stations stations = (Stations)response;
+        if (response instanceof Stations) {
+            Stations stations = (Stations) response;
+            this.stations = stations;
             mapDrawHelper.drawStations(stations);
         }
-        if(response instanceof RoutesOnStations){
+        if (response instanceof RoutesOnStations) {
             progress_bar.setVisibility(View.GONE);
-            RoutesOnStations routes_ids = (RoutesOnStations)response;
+            RoutesOnStations routes_ids = (RoutesOnStations) response;
             Routes routes_on_station = new Routes();
 
-            for(Routes.Route route: routes.getRoutes()){
-                for(Integer route_id: routes_ids.getRoutes_on_stations()){
-                    String s = route_id+"";
-                    if(s.equals(route.getBusreportRouteId())){
+            for (Routes.Route route : routes.getRoutes()) {
+                for (Integer route_id : routes_ids.getRoutes_on_stations()) {
+                    String s = route_id + "";
+                    if (s.equals(route.getBusreportRouteId())) {
                         routes_on_station.addRoute(route);
                     }
                 }
@@ -504,8 +563,8 @@ public class MainActivity extends GatewaedActivity {
             sliding_layout.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
         }
 
-        if(response instanceof RouteStations){
-            RouteStations routeStations = (RouteStations)response;
+        if (response instanceof RouteStations) {
+            RouteStations routeStations = (RouteStations) response;
             this.routeStations = routeStations;
         }
 
@@ -525,45 +584,44 @@ public class MainActivity extends GatewaedActivity {
 
 
     /**
-     *
-     * @param routes маршруты которые в списке
+     * @param routes       маршруты которые в списке
      * @param checkedRoute отмеченые маршруты (если надо)
      */
-    private void setRoutesOnRouteFragment(Routes routes, Routes checkedRoute){
+    private void setRoutesOnRouteFragment(Routes routes, Routes checkedRoute) {
         RoutesFragment fragment = findRoutesFragment();
         setFragment(fragment, R.id.slide_container);
-        if(fragment!=null){
+        if (fragment != null) {
             fragment.setRoutes(routes, checkedRoute);
-        }else{
+        } else {
             throw new RuntimeException("RoutesFragment is null");
         }
 
     }
 
-    private void setTimeTableFragment(Routes routes_on_station){
+    private void setTimeTableFragment(Routes routes_on_station) {
         TimeTableFragment fragment = findTimeTableFragment();
         setFragment(fragment, R.id.slide_container);
-        if(fragment!=null){
+        if (fragment != null) {
             fragment.set_routes_on_station(routes_on_station, checkedRoute, currentStation_id);
-        }else{
+        } else {
             throw new RuntimeException("TimeTableFragment is null");
         }
     }
 
-    private RoutesFragment findRoutesFragment(){
+    private RoutesFragment findRoutesFragment() {
         try {
             return findFragment(RoutesFragment.TAG, RoutesFragment.class);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
     }
 
 
-    private TimeTableFragment findTimeTableFragment(){
+    private TimeTableFragment findTimeTableFragment() {
         try {
             return findFragment(TimeTableFragment.TAG, TimeTableFragment.class);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }

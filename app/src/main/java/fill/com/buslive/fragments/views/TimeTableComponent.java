@@ -213,7 +213,7 @@ public class TimeTableComponent extends LinearLayout implements ResponseCallback
 
     @Override
     public void onFailure(String message) {
-        L.trace(message);
+
     }
 
 

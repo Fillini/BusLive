@@ -9,7 +9,7 @@ import fill.com.buslive.utils.LatLon;
  */
 public class Stations implements AbstractPOJO {
 
-    ArrayList<Station> stations;
+    ArrayList<Station> stations = new ArrayList<>();
 
 
     public Stations() {
@@ -30,6 +30,10 @@ public class Stations implements AbstractPOJO {
         }
 
         return null;
+    }
+
+    public ArrayList<Station> getStations(){
+        return stations;
     }
 
 
