@@ -16,6 +16,7 @@ import fill.com.buslive.http.pojo.AbstractPOJO;
 import fill.com.buslive.http.pojo.Busses;
 import fill.com.buslive.http.pojo.Cities;
 import fill.com.buslive.http.pojo.Countries;
+import fill.com.buslive.http.pojo.Predictions;
 import fill.com.buslive.http.pojo.RouteStations;
 import fill.com.buslive.http.pojo.Routes;
 import fill.com.buslive.http.pojo.RoutesOnStations;
@@ -44,6 +45,7 @@ public class ServerGateway extends Gateway {
     public static final String BUSSES_PREFIX = "/cities/{city_id}/routes/{route_id}/busses";
     public static final String ROUTESTATIONS_PREFIX = "/cities/{city_id}/routestations";
     public static final String ROUTES_ON_STATIONS_PREFIX = "/cities/{city_id}/stations/{station_id}/routesatstation";
+    public static final String PREDICTIONS_PREFIX = "/cities/{city_id}/stations/{station_id}/prediction";
 
 
 
@@ -125,6 +127,10 @@ public class ServerGateway extends Gateway {
         executeCallback(service.getRoutesOnStations(city_id, station_id));
     }
 
+    public void getPredictions(String city_id, String station_id){
+        executeCallback(service.getPredictions(city_id, station_id));
+    }
+
 
     private <T extends AbstractPOJO> void executeCallback(Call<T> call){
 
@@ -169,6 +175,17 @@ public class ServerGateway extends Gateway {
          */
         @GET(ROUTES_ON_STATIONS_PREFIX)
         Call<RoutesOnStations> getRoutesOnStations(@Path("city_id") String city_id, @Path("station_id") String station_id);
+
+
+        /**
+         *
+         * Выводит прогноз по маршрутам
+         * @param city_id
+         * @param station_id
+         * @return
+         */
+        @GET(PREDICTIONS_PREFIX)
+        Call<Predictions> getPredictions(@Path("city_id") String city_id, @Path("station_id") String station_id);
     }
 
 }

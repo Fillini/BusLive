@@ -53,6 +53,8 @@ import material.MaterialProgressBar;
 
 
 //TODO: Сделать сплэш экран с индикацией загрузки контента.
+//TODO: Сделать кнопку ближайшей остановки( появляется только тогда когда пользователь стоит на остановке)
+
 
 
 //TODO: Реализовать  //http://infobus.kz/cities/13/stations/137/prediction   //http://infobus.kz/cities/13/stations/137/routesatstation
@@ -104,6 +106,7 @@ public class MainActivity extends GatewaedActivity {
     private float current_zoom = 12;
     private LatLng current_latlng = new LatLng(51.154191, 71.416905); // astana coords
     private String current_sliding_state;
+    private String currentStation_id;
 
 
     @Override
@@ -172,11 +175,14 @@ public class MainActivity extends GatewaedActivity {
         setCheckedRoute(event.getChecked_route());
     }
 
+
+
     public void onEvent(ClickStationEvent event){
         Stations.Station station = event.getStation();
         gateway.getRoutesOnStations(spHelper.getCity(), station.getId());
         progress_bar.setVisibility(View.VISIBLE);
-        sliding_title_tv.setText(station.getName());
+        sliding_title_tv.setText("Остановка: "+station.getName());
+        currentStation_id = station.getId();
     }
 
 
@@ -280,7 +286,6 @@ public class MainActivity extends GatewaedActivity {
                     toolbar_offset = 0.0f;
                 }
                 toolbar.setTranslationY(-1 * toolbar_offset * 2);
-
 
                 if (slideOffset <= sliding_layout.getAnchorPoint()) {
                     chevron_iv.setRotation(slideOffset * -180*2);
@@ -539,7 +544,7 @@ public class MainActivity extends GatewaedActivity {
         TimeTableFragment fragment = findTimeTableFragment();
         setFragment(fragment, R.id.slide_container);
         if(fragment!=null){
-            fragment.set_routes_on_station(routes_on_station);
+            fragment.set_routes_on_station(routes_on_station, checkedRoute, currentStation_id);
         }else{
             throw new RuntimeException("TimeTableFragment is null");
         }

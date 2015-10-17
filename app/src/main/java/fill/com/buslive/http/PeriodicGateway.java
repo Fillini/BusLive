@@ -3,11 +3,7 @@ package fill.com.buslive.http;
 import android.content.Context;
 import android.os.Handler;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-
 import fill.com.buslive.http.pojo.Routes;
-import fill.com.buslive.utils.L;
 
 /**
  * Created by Fill on 13.01.2015.
@@ -24,7 +20,10 @@ public class PeriodicGateway extends ServerGateway {
 
     private boolean isStop = false;
 
-    Handler handler = new Handler();
+    Handler getBussesHandler = new Handler();
+
+    private boolean isGetPredictionStop = false;
+    Handler getPredictionsHandler = new Handler();
 
     public PeriodicGateway(Context context, ResponseCallback callback) {
         super(context, callback);
@@ -36,28 +35,42 @@ public class PeriodicGateway extends ServerGateway {
      */
     public void startGetBusses(final Routes checkedRoutes){
         this.checkedRoutes = checkedRoutes;
-        handler.removeCallbacksAndMessages(null);
-        handler.postDelayed(new Runnable() {
+        getBussesHandler.removeCallbacksAndMessages(null);
+        getBussesHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 for (Routes.Route route : checkedRoutes.getRoutes()) {
                     getBusses(route.getCityId(), route.getBusreportRouteId());
                 }
                 if (!isStop) {
-                    handler.postDelayed(this, PERIOD);
+                    getBussesHandler.postDelayed(this, PERIOD);
                 }
             }
         }, DELAY);
     }
 
+    public void startGetPredictions(final String city_id, final String station_id){
+        getPredictionsHandler.removeCallbacksAndMessages(null);
+        getPredictionsHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if(!isGetPredictionStop){
+                    getPredictions(city_id, station_id);
+                    getPredictionsHandler.postDelayed(this, PERIOD*2);
+                }
+            }
+        }, DELAY);
+    }
+
+
     public void stopGetBusses(){
         isStop = true;
-        handler.removeCallbacksAndMessages(null);
+        getBussesHandler.removeCallbacksAndMessages(null);
     }
 
     public void pauseGetBusses(){
         isStop = true;
-        handler.removeCallbacksAndMessages(null);
+        getBussesHandler.removeCallbacksAndMessages(null);
     }
 
     public void restartGetBusses(){
@@ -67,6 +80,14 @@ public class PeriodicGateway extends ServerGateway {
         }
     }
 
+
+
+    public void pauseGetPredictions(){
+        isGetPredictionStop=true;
+        getPredictionsHandler.removeCallbacksAndMessages(null);
+    }
+
+
     public void addRoute(Routes.Route route){
         checkedRoutes.addRoute(route);
     }
@@ -74,7 +95,8 @@ public class PeriodicGateway extends ServerGateway {
 
     public void destroy(){
         isStop = true;
-        handler.removeCallbacksAndMessages(null);
+        getBussesHandler.removeCallbacksAndMessages(null);
+        getPredictionsHandler.removeCallbacksAndMessages(null);
         checkedRoutes=null;
     }
 

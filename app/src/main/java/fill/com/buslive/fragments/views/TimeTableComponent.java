@@ -1,6 +1,7 @@
 package fill.com.buslive.fragments.views;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.v7.widget.SwitchCompat;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -17,23 +18,35 @@ import java.util.ArrayList;
 
 import fill.com.buslive.R;
 import fill.com.buslive.http.PeriodicGateway;
+import fill.com.buslive.http.ResponseCallback;
 import fill.com.buslive.http.ServerGateway;
+import fill.com.buslive.http.pojo.AbstractPOJO;
+import fill.com.buslive.http.pojo.Predictions;
 import fill.com.buslive.http.pojo.Routes;
 import fill.com.buslive.utils.L;
+import fill.com.buslive.utils.SPHelper;
 
 /**
  * Created by Fill on 14.10.2015.
  */
-public class TimeTableComponent extends LinearLayout {
+public class TimeTableComponent extends LinearLayout implements ResponseCallback {
 
     ListView list;
     Context context;
     LayoutInflater inflater;
 
-    ServerGateway gateway;
     PeriodicGateway periodicGateway;
 
     Routes routes_on_station = new Routes();
+    Routes checked_routes = new Routes();
+    String currentStation_id;
+
+    SPHelper spHelper;
+
+    RoutesAdapter adapter;
+
+    Predictions predictions = new Predictions();
+
 
     public TimeTableComponent(Context context) {
         super(context);
@@ -42,30 +55,40 @@ public class TimeTableComponent extends LinearLayout {
     public TimeTableComponent(Context context, AttributeSet attrs) {
         super(context, attrs);
         this.context = context;
+        spHelper = SPHelper.getInstance(context);
         setOrientation(LinearLayout.VERTICAL);
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inflater.inflate(R.layout.view_routes, this, true);
         list = (ListView) findViewById(R.id.list);
         list.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+        periodicGateway = new PeriodicGateway(context, this);
     }
 
     public Routes getRoutes_on_station() {
         return routes_on_station;
     }
 
-    public void setRoutes_on_station(Routes routes_on_station) {
+    public void setRoutes_on_station(Routes routes_on_station, Routes checked_routes, String currentStation_id) {
         if (routes_on_station == null) {
             this.routes_on_station = new Routes();
         } else {
             this.routes_on_station = routes_on_station;
         }
+
+        this.checked_routes = checked_routes;
+        this.currentStation_id = currentStation_id;
+
         buildList();
+
+        periodicGateway.startGetPredictions(spHelper.getCity(), currentStation_id);
+
     }
 
     private void buildList() {
-        list.setAdapter(new RoutesAdapter());
-
+        adapter = new RoutesAdapter();
+        list.setAdapter(adapter);
     }
+
 
     public class RoutesAdapter extends BaseAdapter {
 
@@ -91,55 +114,91 @@ public class TimeTableComponent extends LinearLayout {
             if (convertView == null) {
                 convertView = inflater.inflate(R.layout.item_time_table, parent, false);
                 v_h = new ViewHolder();
-                v_h.begin_station_tv = (TextView) convertView.findViewById(R.id.begin_station_tv);
-                v_h.end_station_tv = (TextView) convertView.findViewById(R.id.end_station_tv);
+                v_h.prediction_tv = (TextView) convertView.findViewById(R.id.prediction_tv);
                 v_h.bus_icon_iv = (BusNumberView) convertView.findViewById(R.id.bus_icon_iv);
                 v_h.switch_compat = (SwitchCompat) convertView.findViewById(R.id.switch_compat);
                 convertView.setTag(v_h);
             } else {
                 v_h = (ViewHolder) convertView.getTag();
             }
-
-            String route_name = routes_on_station.get(position).getRouteName();
             String route_number = routes_on_station.get(position).getRouteNumber();
             route_number.trim();
             route_number = route_number.replace(" ", "");
 
-            String[] splitter_route = route_name.split("-");
 
-            TextView begin_station_tv = v_h.begin_station_tv;
-            TextView end_station_tv = v_h.end_station_tv;
             BusNumberView bus_icon_iv = v_h.bus_icon_iv;
             SwitchCompat switch_compat = v_h.switch_compat;
-
-            if (splitter_route.length >= 2) {
-                begin_station_tv.setText(splitter_route[0].trim());
-                end_station_tv.setText(splitter_route[splitter_route.length-1].trim());
-            } else {
-                switch_compat.setText(routes_on_station.get(position).getRouteNumber() + " - " + routes_on_station.get(position).getRouteName());
-            }
-
-            //text.setCheckMarkDrawable(R.drawable.check_mark);
 
             bus_icon_iv.setRoute_number(route_number);
 
 
+            TextView prediction_tv = v_h.prediction_tv;
+            String busResportRouteId = routes_on_station.getRoutes().get(position).getBusreportRouteId();
 
-            /*if (routes_on_station.contains(routes_on_station.get(position))) {
-                text.setChecked(true);
+
+            for(Predictions.Prediction prediction : predictions.getPredictions()){
+                 if(prediction.getRouteId().equals(busResportRouteId)  && (prediction.isMainPrediction())){
+                     int prediction_time = Integer.valueOf(prediction.getPrediction());
+                     int minute = (int)Math.floor(prediction_time / 60);
+
+                     if(prediction_time>10*60){
+                         prediction_tv.setText("--:--");
+                         prediction_tv.setTextColor(Color.parseColor("#c6c6c6"));
+                     }
+
+                     if(prediction_time<=10*60){
+                         prediction_tv.setText(minute+"мин.");
+                         prediction_tv.setTextColor(Color.parseColor("#41b613"));
+                     }
+                     if(prediction_time<=5*60){
+                         prediction_tv.setText(minute+"мин.");
+                         prediction_tv.setTextColor(Color.parseColor("#eac81e"));
+                     }
+                     if(prediction_time<=1*60){
+                         prediction_tv.setText(prediction_time+"сек.");
+                         prediction_tv.setTextColor(Color.parseColor("#ea1e1e"));
+                     }
+
+                 }else{
+                     prediction_tv.setText("--:--");
+                     prediction_tv.setTextColor(Color.parseColor("#c6c6c6"));
+                 }
+            }
+
+
+            if (checked_routes.getRoutes().contains(routes_on_station.get(position))) {
+                switch_compat.setChecked(true);
             }else{
-                text.setChecked(false);
-            }*/
+                switch_compat.setChecked(false);
+            }
             return convertView;
         }
     }
 
     public static class ViewHolder {
-        TextView begin_station_tv;
-        TextView end_station_tv;
+        TextView prediction_tv;
         BusNumberView bus_icon_iv;
         SwitchCompat switch_compat;
     }
 
 
+
+    @Override
+    public void onSucces(AbstractPOJO response) {
+        predictions = (Predictions)response;
+        adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onFailure(String message) {
+        L.trace(message);
+    }
+
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        periodicGateway.pauseGetPredictions();
+        periodicGateway = null;
+    }
 }
