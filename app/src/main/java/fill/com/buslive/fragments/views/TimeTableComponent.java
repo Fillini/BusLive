@@ -47,6 +47,8 @@ public class TimeTableComponent extends LinearLayout implements ResponseCallback
 
     Predictions predictions = new Predictions();
 
+    OnCheckRouteListener onCheckRouteListener;
+
 
     public TimeTableComponent(Context context) {
         super(context);
@@ -90,6 +92,10 @@ public class TimeTableComponent extends LinearLayout implements ResponseCallback
     }
 
 
+    public void setOnCheckRouteListener(OnCheckRouteListener onCheckRouteListener) {
+        this.onCheckRouteListener = onCheckRouteListener;
+    }
+
     public class RoutesAdapter extends BaseAdapter {
 
         @Override
@@ -108,7 +114,7 @@ public class TimeTableComponent extends LinearLayout implements ResponseCallback
         }
 
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
+        public View getView(final int position, View convertView, ViewGroup parent) {
 
             ViewHolder v_h;
             if (convertView == null) {
@@ -127,7 +133,7 @@ public class TimeTableComponent extends LinearLayout implements ResponseCallback
 
 
             BusNumberView bus_icon_iv = v_h.bus_icon_iv;
-            SwitchCompat switch_compat = v_h.switch_compat;
+            final SwitchCompat switch_compat = v_h.switch_compat;
 
             bus_icon_iv.setRoute_number(route_number);
 
@@ -171,6 +177,22 @@ public class TimeTableComponent extends LinearLayout implements ResponseCallback
             }else{
                 switch_compat.setChecked(false);
             }
+
+            switch_compat.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (switch_compat.isChecked()) {
+                        checked_routes.addRoute(routes_on_station.get(position));
+                    } else {
+                        checked_routes.getRoutes().remove(routes_on_station.get(position));
+                    }
+                    if (onCheckRouteListener != null) {
+                        onCheckRouteListener.onCheckRoute(checked_routes);
+                    }
+                }
+            });
+
+
             return convertView;
         }
     }
@@ -200,5 +222,10 @@ public class TimeTableComponent extends LinearLayout implements ResponseCallback
         super.onDetachedFromWindow();
         periodicGateway.pauseGetPredictions();
         periodicGateway = null;
+    }
+
+
+    public interface OnCheckRouteListener {
+        void onCheckRoute(Routes checkedRoutes);
     }
 }

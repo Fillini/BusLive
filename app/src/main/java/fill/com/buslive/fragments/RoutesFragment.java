@@ -35,16 +35,6 @@ public class RoutesFragment extends Fragment {
     Routes routes;
     Routes checkedRoutes;
 
-
-   /* public static RoutesFragment newInstance(Routes routes, ArrayList<Routes.Route> checkedRoutes){
-        RoutesFragment fragment = new RoutesFragment();
-        Bundle arguments = new Bundle();
-        arguments.putSerializable(ROUTES_PARAM, routes);
-        arguments.putSerializable(CHECKED_ROUTES_PARAM, checkedRoutes);
-        fragment.setArguments(arguments);
-        return fragment;
-    }*/
-
     public RoutesFragment() {
 
     }

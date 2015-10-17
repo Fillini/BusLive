@@ -9,7 +9,9 @@ import android.view.ViewGroup;
 
 import java.util.ArrayList;
 
+import de.greenrobot.event.EventBus;
 import fill.com.buslive.R;
+import fill.com.buslive.event.CheckRouteEvent;
 import fill.com.buslive.fragments.views.TimeTableComponent;
 import fill.com.buslive.http.pojo.Routes;
 import fill.com.buslive.utils.L;
@@ -22,6 +24,7 @@ public class TimeTableFragment extends Fragment {
     public static final String TAG = "timeTableFragment";
 
     TimeTableComponent time_table_component;
+    EventBus eventBus = EventBus.getDefault();
 
     public static final String ROUTES_ON_STATION_PARAM = "routes_on_station_param";
     public static final String CHECKED_ROUTES_PARAM = "checked_routes_param";
@@ -47,6 +50,15 @@ public class TimeTableFragment extends Fragment {
         if(routes_on_station!=null){
             time_table_component.setRoutes_on_station(routes_on_station, checked_routes, currentStation_id);
         }
+
+        time_table_component.setOnCheckRouteListener(new TimeTableComponent.OnCheckRouteListener() {
+            @Override
+            public void onCheckRoute(Routes checkedRoutes) {
+                CheckRouteEvent event = new CheckRouteEvent();
+                event.setChecked_route(checkedRoutes);
+                eventBus.post(event);
+            }
+        });
 
         return time_table_component;
     }
