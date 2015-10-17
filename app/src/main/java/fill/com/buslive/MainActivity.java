@@ -57,8 +57,6 @@ import material.MaterialProgressBar;
 //TODO: Сделать напоминалку (типа будильник, заводишь на определенное время, на определенный автобус)
 
 //TODO: Сделать сплэш экран с индикацией загрузки контента.
-//TODO: Сделать кнопку ближайшей остановки( появляется только тогда когда пользователь стоит на остановке)
-
 
 //TODO: Реализовать паттерн state
 
@@ -208,6 +206,7 @@ public class MainActivity extends GatewaedActivity {
                             return;
                         }
 
+                        //TODO: переписать это. код гавно
                         String closer_station = "0";
                         String closer_station_name = "";
 
