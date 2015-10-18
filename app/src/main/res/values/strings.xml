@@ -25,5 +25,6 @@
     <string name="busses">Автобусы</string>
     <string name="title_activity_routes">Маршруты</string>
     <string name="title_activity_station">Остановки</string>
+    <string name="banner_ad_unit_id">ca-app-pub-1727983765565842/7115389611</string>
 
 </resources>

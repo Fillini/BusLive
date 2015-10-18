@@ -1,6 +1,8 @@
 package fill.com.buslive;
 
+import android.content.Intent;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
@@ -24,6 +26,7 @@ import fill.com.buslive.http.ServerGateway;
 import fill.com.buslive.http.pojo.AbstractPOJO;
 import fill.com.buslive.http.pojo.Cities;
 import fill.com.buslive.http.pojo.Countries;
+import fill.com.buslive.utils.L;
 import fill.com.buslive.utils.SPHelper;
 
 
@@ -40,6 +43,8 @@ public class SettingsActivity extends PreferenceActivity implements ResponseCall
     ListPreference countryList;
     ListPreference cityList;
 
+    Preference rating_preference;
+
 
     /*-------Флаг указывающий переворачивался экран или нет--------*/
     private boolean isRotated = false;
@@ -54,6 +59,7 @@ public class SettingsActivity extends PreferenceActivity implements ResponseCall
 
     Countries countries;
     Cities cities;
+
 
     private SPHelper spHelper;
 
@@ -152,10 +158,29 @@ public class SettingsActivity extends PreferenceActivity implements ResponseCall
 
         rootScreen.addPreference(cityList);
 
+        rating_preference = new Preference(this);
+        rating_preference.setTitle("Оценить приложение");
+
+        rating_preference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                final String appPackageName = getPackageName();
+                try {
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
+                } catch (android.content.ActivityNotFoundException anfe) {
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
+                }
+                return false;
+            }
+        });
+
+
+        rootScreen.addPreference(rating_preference);
+
+
 
         if(savedInstanceState!=null   && savedInstanceState.getSerializable(CITIES_KEY)!=null  && savedInstanceState.getSerializable(COUNTRIES_KEY)!=null ){
             isRotated = true;
-
             cities = (Cities)savedInstanceState.getSerializable(CITIES_KEY);
             countries = (Countries)savedInstanceState.getSerializable(COUNTRIES_KEY);
             onSucces(countries);

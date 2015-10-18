@@ -25,6 +25,9 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.concurrent.Executor;
@@ -67,6 +70,10 @@ public class RoutesComponent extends LinearLayout {
         list = (ListView) findViewById(R.id.list);
         //list.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
         //setListeners();
+
+        AdView mAdView = (AdView) findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
     }
 
     public Routes getCheckedSet() {
