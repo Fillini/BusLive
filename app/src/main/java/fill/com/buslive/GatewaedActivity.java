@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.util.TypedValue;
 
 import fill.com.buslive.fragments.RoutesFragment;
 import fill.com.buslive.http.GeocodingGateway;
@@ -81,6 +82,15 @@ public class GatewaedActivity extends AppCompatActivity implements
             player.prepare();
             player.start();
         } catch (Exception e) {}
+    }
+
+    public int getActionBarHeight(){
+        TypedValue tv = new TypedValue();
+        if (getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
+            int actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data, getResources().getDisplayMetrics());
+            return actionBarHeight;
+        }
+        return 0;
     }
 
     @Override

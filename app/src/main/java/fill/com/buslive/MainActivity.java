@@ -65,6 +65,8 @@ import material.MaterialProgressBar;
 
 //TODO: Реализовать паттерн state
 
+//TODO: Сделать закладки остановок и маршрутов (типа любимый маршрут или остановка для быстрого поиска)
+
 
 public class MainActivity extends GatewaedActivity implements GoogleMap.OnMyLocationChangeListener {
 
@@ -117,8 +119,6 @@ public class MainActivity extends GatewaedActivity implements GoogleMap.OnMyLoca
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-
         eventbus.register(this);
         sliding_layout = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
         slideView = (LinearLayout) findViewById(R.id.slideView);
@@ -351,11 +351,7 @@ public class MainActivity extends GatewaedActivity implements GoogleMap.OnMyLoca
             return;
         }
         if (current_sliding_state.equals(SlidingUpPanelLayout.PanelState.ANCHORED.toString())) {
-            TypedValue tv = new TypedValue();
-            if (getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
-                int actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data, getResources().getDisplayMetrics());
-                toolbar.setTranslationY(-1 * actionBarHeight * 2);
-            }
+            toolbar.setTranslationY(-1 * getActionBarHeight() * 2);
             chevron_iv.setRotation(180);
             chevron_iv.setAlpha(1.0f);
             ic_back.setAlpha(0.0f);
@@ -364,11 +360,7 @@ public class MainActivity extends GatewaedActivity implements GoogleMap.OnMyLoca
             return;
         }
         if (current_sliding_state.equals(SlidingUpPanelLayout.PanelState.EXPANDED.toString())) {
-            TypedValue tv = new TypedValue();
-            if (getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
-                int actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data, getResources().getDisplayMetrics());
-                toolbar.setTranslationY(-1 * actionBarHeight * 2);
-            }
+            toolbar.setTranslationY(-1 * getActionBarHeight() * 2);
             chevron_iv.setRotation(180);
             chevron_iv.setAlpha(0.0f);
             ic_back.setAlpha(1.0f);
@@ -394,7 +386,7 @@ public class MainActivity extends GatewaedActivity implements GoogleMap.OnMyLoca
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    @Override
+       @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putSerializable(CHECKED_ROUTES_KEY, checkedRoute);
@@ -588,7 +580,6 @@ public class MainActivity extends GatewaedActivity implements GoogleMap.OnMyLoca
     @Override
     protected void onResume() {
         super.onResume();
-
         if (routes == null) {
             gateway.getRoutes(spHelper.getCity());
             progress_bar.setVisibility(View.VISIBLE);
@@ -639,7 +630,6 @@ public class MainActivity extends GatewaedActivity implements GoogleMap.OnMyLoca
                 return station;
             }
         }
-
         return null;
 
     }
