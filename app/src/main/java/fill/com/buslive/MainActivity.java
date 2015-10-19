@@ -65,7 +65,7 @@ import material.MaterialProgressBar;
 //TODO: Реализовать паттерн state
 
 
-public class MainActivity extends GatewaedActivity {
+public class MainActivity extends GatewaedActivity implements GoogleMap.OnMyLocationChangeListener {
 
 
     SupportMapFragment mapFragment;
@@ -202,63 +202,7 @@ public class MainActivity extends GatewaedActivity {
                 map.getUiSettings().setZoomControlsEnabled(true);
                 map.getUiSettings().setCompassEnabled(true);
 
-                map.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener() {
-                    @Override
-                    public void onMyLocationChange(Location location) {
-
-                        if (stations == null) {
-                            return;
-                        }
-
-                        //TODO: переписать это. код гавно
-                        String closer_station = "0";
-                        String closer_station_name = "";
-
-                        for (Stations.Station station : stations.getStations()) {
-                            LatLng station_location = station.getLatlon().toLatLng();
-                            LatLng my_location = new LatLng(location.getLatitude(), location.getLongitude());
-                            double distance = LocationUtils.distance(station_location, my_location);
-                            if (distance < 20) {
-                                closer_station = station.getId();
-                                closer_station_name = station.getName();
-                            }
-                        }
-
-                        final String selected_station = closer_station;
-                        final String selected_station_name = closer_station_name;
-
-
-                        if (closer_station.equals("0")) {
-                            my_station_btn.setVisibility(View.GONE);
-                        } else {
-                            if(my_station_btn.getVisibility()!=View.VISIBLE){
-                                try {
-                                    MediaPlayer player = new MediaPlayer();
-                                    AssetFileDescriptor afd = getAssets().openFd("notify.mp3");
-                                    player.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
-                                    player.prepare();
-                                    player.start();
-                                } catch (Exception e) {}
-                            }
-
-
-                            my_station_btn.setVisibility(View.VISIBLE);
-
-                            my_station_btn.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    gateway.getRoutesOnStations(spHelper.getCity(), selected_station);
-                                    progress_bar.setVisibility(View.VISIBLE);
-                                    sliding_title_tv.setText("Остановка: " + selected_station_name);
-                                    currentStation_id = selected_station;
-                                }
-                            });
-                        }
-
-
-                    }
-                });
-
+                map.setOnMyLocationChangeListener(MainActivity.this);
 
                 solveLocation();
 
@@ -655,5 +599,58 @@ public class MainActivity extends GatewaedActivity {
     protected void onDestroy() {
         super.onDestroy();
         eventbus.unregister(this);
+    }
+
+    @Override
+    public void onMyLocationChange(Location location) {
+
+        if (stations == null) {
+            return;
+        }
+
+        //TODO: переписать это. код гавно
+        String closer_station = "0";
+        String closer_station_name = "";
+
+        for (Stations.Station station : stations.getStations()) {
+            LatLng station_location = station.getLatlon().toLatLng();
+            LatLng my_location = new LatLng(location.getLatitude(), location.getLongitude());
+            double distance = LocationUtils.distance(station_location, my_location);
+            if (distance < 20) {
+                closer_station = station.getId();
+                closer_station_name = station.getName();
+            }
+        }
+
+        final String selected_station = closer_station;
+        final String selected_station_name = closer_station_name;
+
+
+        if (closer_station.equals("0")) {
+            my_station_btn.setVisibility(View.GONE);
+        } else {
+            if(my_station_btn.getVisibility()!=View.VISIBLE){
+                try {
+                    MediaPlayer player = new MediaPlayer();
+                    AssetFileDescriptor afd = getAssets().openFd("notify.mp3");
+                    player.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+                    player.prepare();
+                    player.start();
+                } catch (Exception e) {}
+            }
+
+
+            my_station_btn.setVisibility(View.VISIBLE);
+
+            my_station_btn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    gateway.getRoutesOnStations(spHelper.getCity(), selected_station);
+                    progress_bar.setVisibility(View.VISIBLE);
+                    sliding_title_tv.setText("Остановка: " + selected_station_name);
+                    currentStation_id = selected_station;
+                }
+            });
+        }
     }
 }
