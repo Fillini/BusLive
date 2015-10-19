@@ -14,6 +14,9 @@ import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+
 import java.util.ArrayList;
 
 import fill.com.buslive.R;
@@ -60,10 +63,17 @@ public class TimeTableComponent extends LinearLayout implements ResponseCallback
         spHelper = SPHelper.getInstance(context);
         setOrientation(LinearLayout.VERTICAL);
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        inflater.inflate(R.layout.view_routes, this, true);
+        inflater.inflate(R.layout.view_time_table, this, true);
         list = (ListView) findViewById(R.id.list);
         list.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
         periodicGateway = new PeriodicGateway(context, this);
+
+        /*Admob*/
+        AdView mAdView = (AdView) findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder()
+                .addTestDevice("D1CB1EC7583279447DEC2EAA4839C962")
+                .build();
+        mAdView.loadAd(adRequest);
     }
 
     public Routes getRoutes_on_station() {
@@ -147,21 +157,21 @@ public class TimeTableComponent extends LinearLayout implements ResponseCallback
                      int prediction_time = Integer.valueOf(prediction.getPrediction());
                      int minute = (int)Math.floor(prediction_time / 60);
 
-                     if(prediction_time>10*60){
+                     if(prediction_time>20*60){
                          prediction_tv.setText("--:--");
                          prediction_tv.setTextColor(Color.parseColor("#c6c6c6"));
                      }
 
-                     if(prediction_time<=10*60){
-                         prediction_tv.setText(minute+"мин.");
+                     if(prediction_time<=20*60){
+                         prediction_tv.setText(minute+" мин.");
                          prediction_tv.setTextColor(Color.parseColor("#41b613"));
                      }
                      if(prediction_time<=5*60){
-                         prediction_tv.setText(minute+"мин.");
-                         prediction_tv.setTextColor(Color.parseColor("#eac81e"));
+                         prediction_tv.setText(minute+" мин.");
+                         prediction_tv.setTextColor(Color.parseColor("#FFFFBB33"));
                      }
                      if(prediction_time<=1*60){
-                         prediction_tv.setText(prediction_time+"сек.");
+                         prediction_tv.setText(prediction_time+" сек.");
                          prediction_tv.setTextColor(Color.parseColor("#ea1e1e"));
                      }
 

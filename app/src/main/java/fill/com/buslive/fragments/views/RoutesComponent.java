@@ -68,11 +68,12 @@ public class RoutesComponent extends LinearLayout {
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inflater.inflate(R.layout.view_routes, this, true);
         list = (ListView) findViewById(R.id.list);
-        //list.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-        //setListeners();
 
+        /*AdMob*/
         AdView mAdView = (AdView) findViewById(R.id.adView);
-        AdRequest adRequest = new AdRequest.Builder().build();
+        AdRequest adRequest = new AdRequest.Builder()
+                .addTestDevice("D1CB1EC7583279447DEC2EAA4839C962")
+                .build();
         mAdView.loadAd(adRequest);
     }
 
