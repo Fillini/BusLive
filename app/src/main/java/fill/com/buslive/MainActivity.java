@@ -608,49 +608,41 @@ public class MainActivity extends GatewaedActivity implements GoogleMap.OnMyLoca
             return;
         }
 
-        //TODO: переписать это. код гавно
-        String closer_station = "0";
-        String closer_station_name = "";
-
-        for (Stations.Station station : stations.getStations()) {
-            LatLng station_location = station.getLatlon().toLatLng();
-            LatLng my_location = new LatLng(location.getLatitude(), location.getLongitude());
-            double distance = LocationUtils.distance(station_location, my_location);
-            if (distance < 20) {
-                closer_station = station.getId();
-                closer_station_name = station.getName();
-            }
-        }
-
-        final String selected_station = closer_station;
-        final String selected_station_name = closer_station_name;
-
-
-        if (closer_station.equals("0")) {
-            my_station_btn.setVisibility(View.GONE);
-        } else {
+        final Stations.Station closer_station = findCloserStation(location);
+        if(closer_station!=null){
             if(my_station_btn.getVisibility()!=View.VISIBLE){
-                try {
-                    MediaPlayer player = new MediaPlayer();
-                    AssetFileDescriptor afd = getAssets().openFd("notify.mp3");
-                    player.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
-                    player.prepare();
-                    player.start();
-                } catch (Exception e) {}
+                playNotifySound();
             }
-
-
             my_station_btn.setVisibility(View.VISIBLE);
 
             my_station_btn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    gateway.getRoutesOnStations(spHelper.getCity(), selected_station);
+                    currentStation_id = closer_station.getId();
+                    gateway.getRoutesOnStations(spHelper.getCity(), currentStation_id);
                     progress_bar.setVisibility(View.VISIBLE);
-                    sliding_title_tv.setText("Остановка: " + selected_station_name);
-                    currentStation_id = selected_station;
+                    sliding_title_tv.setText("Остановка: " + closer_station.getName());
                 }
             });
+
+
+        }else{
+            my_station_btn.setVisibility(View.GONE);
         }
+
+    }
+
+    private Stations.Station findCloserStation(Location location){
+        for (Stations.Station station : stations.getStations()) {
+            LatLng station_location = station.getLatlon().toLatLng();
+            LatLng my_location = new LatLng(location.getLatitude(), location.getLongitude());
+            double distance = LocationUtils.distance(station_location, my_location);
+            if (distance < 20) {
+                return station;
+            }
+        }
+
+        return null;
+
     }
 }

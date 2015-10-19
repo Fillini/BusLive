@@ -1,5 +1,7 @@
 package fill.com.buslive;
 
+import android.content.res.AssetFileDescriptor;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -70,6 +72,16 @@ public class GatewaedActivity extends AppCompatActivity implements
         ft.commit();
     }
 
+
+    public void playNotifySound(){
+        try {
+            MediaPlayer player = new MediaPlayer();
+            AssetFileDescriptor afd = getAssets().openFd("notify.mp3");
+            player.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+            player.prepare();
+            player.start();
+        } catch (Exception e) {}
+    }
 
     @Override
     public void onSucces(AbstractPOJO response) {
