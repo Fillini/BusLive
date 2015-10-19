@@ -31,15 +31,8 @@
         android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"
         ads:adSize="BANNER"
-<<<<<<< HEAD
         ads:adUnitId="@string/banner_ad_unit_id_stations">
     </com.google.android.gms.ads.AdView>
 
 </RelativeLayout>
-=======
-        ads:adUnitId="@string/banner_ad_unit_id_station">
-    </com.google.android.gms.ads.AdView>
 
-</RelativeLayout>
-
->>>>>>> github/master

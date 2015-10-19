@@ -72,7 +72,9 @@ public class RoutesComponent extends LinearLayout {
         //setListeners();
 
         AdView mAdView = (AdView) findViewById(R.id.adView);
-        AdRequest adRequest = new AdRequest.Builder().build();
+        AdRequest adRequest = new AdRequest.Builder()
+                .addTestDevice("628FEC8F638678EB52585E50B797BD15")
+                .build();
         mAdView.loadAd(adRequest);
     }
 
