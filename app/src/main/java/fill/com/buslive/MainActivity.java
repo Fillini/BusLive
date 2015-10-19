@@ -9,6 +9,7 @@ import android.location.Location;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
@@ -58,7 +59,7 @@ import fill.com.buslive.utils.MapDrawHelper;
 import material.MaterialProgressBar;
 
 
-//TODO: Сделать напоминалку (типа будильник, заводишь на определенное время, на определенный автобус)
+//TODO: Сделать напоминалку (типа будильник, заводишь на определенное время, на определенный автобус) (невозможно)
 
 //TODO: Сделать сплэш экран с индикацией загрузки контента.
 
@@ -603,11 +604,9 @@ public class MainActivity extends GatewaedActivity implements GoogleMap.OnMyLoca
 
     @Override
     public void onMyLocationChange(Location location) {
-
         if (stations == null) {
             return;
         }
-
         final Stations.Station closer_station = findCloserStation(location);
         if(closer_station!=null){
             if(my_station_btn.getVisibility()!=View.VISIBLE){
@@ -624,7 +623,6 @@ public class MainActivity extends GatewaedActivity implements GoogleMap.OnMyLoca
                     sliding_title_tv.setText("Остановка: " + closer_station.getName());
                 }
             });
-
 
         }else{
             my_station_btn.setVisibility(View.GONE);
