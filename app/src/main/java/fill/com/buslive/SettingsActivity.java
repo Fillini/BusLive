@@ -227,7 +227,6 @@ public class SettingsActivity extends PreferenceActivity implements ResponseCall
                 .setIcon(android.R.drawable.ic_menu_mapmode)
                 .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-
         return super.onPrepareOptionsMenu(menu);
     }
 
