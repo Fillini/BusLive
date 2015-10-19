@@ -33,19 +33,16 @@
             -->
 
 
-
-
-               <meta-data
+               <!--<meta-data
                                     android:name="com.google.android.maps.v2.API_KEY"
                                     android:value="AIzaSyDygljgQF1m9j_0bLfi1y_uswHdCy3n2jE"></meta-data>
-
-
+                                    -->
 
 
         <!-- release key -->
-<!--        <meta-data
+        <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyCbcBOEhxvuDZSn1kRPShgvjHSphGnXmYQ"></meta-data>-->
+            android:value="AIzaSyCbcBOEhxvuDZSn1kRPShgvjHSphGnXmYQ"></meta-data>
         <!-- release key -->
 
 
@@ -70,9 +67,6 @@
         <activity
             android:name=".StationActivity"
             android:label="@string/title_activity_station">
-
-
-
 
         </activity>
 
