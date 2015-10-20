@@ -207,11 +207,7 @@ public class MainActivity extends GatewaedActivity implements GoogleMap.OnMyLoca
 
                 solveLocation();
 
-                TypedValue tv = new TypedValue();
-                if (getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
-                    int actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data, getResources().getDisplayMetrics());
-                    map.setPadding(0, actionBarHeight, 0, 0);
-                }
+                map.setPadding(0, getActionBarHeight(), 0, 0);
 
                 map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
                 map.setMyLocationEnabled(true);
