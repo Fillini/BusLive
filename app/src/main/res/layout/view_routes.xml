@@ -19,7 +19,7 @@
         android:listSelector="@drawable/list_selector"
         android:divider="@null"
         android:background="#fff8f8"
-        android:layout_marginBottom="50dp"
+        android:layout_marginTop="50dp"
         >
         <!--android:background="#fff8f8"-->
     </ListView>
@@ -29,7 +29,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_alignParentBottom="true"
+        android:layout_alignParentTop="true"
         ads:adSize="BANNER"
         ads:adUnitId="@string/banner_ad_unit_id_routes">
     </com.google.android.gms.ads.AdView>

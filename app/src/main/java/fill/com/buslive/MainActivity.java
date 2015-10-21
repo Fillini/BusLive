@@ -66,6 +66,7 @@ import material.MaterialProgressBar;
 //TODO: Реализовать паттерн state
 
 //TODO: Сделать закладки остановок и маршрутов (типа любимый маршрут или остановка для быстрого поиска)
+// TODO: Сделать выделенную остановку
 
 
 public class MainActivity extends GatewaedActivity implements GoogleMap.OnMyLocationChangeListener {
@@ -632,15 +633,6 @@ public class MainActivity extends GatewaedActivity implements GoogleMap.OnMyLoca
         }
         return null;
     }
-
-
-
-
-    interface NetworkState{
-        void handle();
-    }
-
-
 
 
 }

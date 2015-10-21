@@ -28,6 +28,7 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.maps.model.VisibleRegion;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -258,11 +259,35 @@ public class MapDrawHelper {
                     clearMarkerByBusName(bus);
 
                     Marker marker = map.addMarker(op);
-                    Map<String, Object> map = new HashMap<>();
-                    map.put("bus", bus);
-                    map.put("marker", marker);
-                    map.put("color", color);
-                    markers.add(map);
+                    Map<String, Object> markerMap = new HashMap<>();
+                    markerMap.put("bus", bus);
+                    markerMap.put("marker", marker);
+                    markerMap.put("color", color);
+                    markers.add(markerMap);
+
+
+                    /*LatLngBounds bounds = map.getProjection().getVisibleRegion().latLngBounds;
+                    VisibleRegion region = map.getProjection().getVisibleRegion();
+                    if(!bounds.contains(marker.getPosition())){
+                        LatLng position = marker.getPosition();
+
+
+                        LatLng[] points = new LatLng[]{
+                                region.nearLeft,
+                                region.nearRight,
+                                region.farLeft,
+                                region.farRight
+                        };
+                        double[] distances = new double[]{
+                                distance(position, points[0]),
+                                distance(position, points[1]),
+                                distance(position, points[2]),
+                                distance(position, points[3])
+                        };
+                        sort(points, distances);
+                    }*/
+
+
                 }
 
 
@@ -389,10 +414,29 @@ public class MapDrawHelper {
 
         private Bitmap createSmallArrowBitmap(Integer direction, int color, String busreportRouteId){
             /**
-             * Ширина и высота берется из расчета 1/25 от ширины экрана
+             * Ширина и высота берется из расчета 1/35 от ширины экрана
              */
             int WIDTH_BASE = display_width / 35;
             int HEIGHT_BASE = display_width / 35;
+
+            Bitmap bm = Bitmap.createBitmap(WIDTH_BASE, HEIGHT_BASE, Bitmap.Config.ARGB_8888);
+            Canvas canv = new Canvas(bm);
+
+            drawArrowCircle(canv, color, direction, WIDTH_BASE, HEIGHT_BASE, CIRCLE_MODE.CIRCLE);
+
+            return bm;
+        }
+
+
+        /**
+         * Рисует точку по краю карты. Если автобус не виден в кадре.
+         */
+        private Bitmap createSmallPossibleArrowBitmap(Integer direction, int color, String busreportRouteId){
+            /**
+             * Ширина и высота берется из расчета 1/45 от ширины экрана
+             */
+            int WIDTH_BASE = display_width / 45;
+            int HEIGHT_BASE = display_width / 45;
 
             Bitmap bm = Bitmap.createBitmap(WIDTH_BASE, HEIGHT_BASE, Bitmap.Config.ARGB_8888);
             Canvas canv = new Canvas(bm);
@@ -433,7 +477,6 @@ public class MapDrawHelper {
             canv.setMatrix(matrix);
             canv.drawBitmap(scalable, 0, 0, paint);
             canv.setMatrix(null);
-
         }
 
         private Bitmap arrowBitmapFactory(float zoom, int direction, int color, String busreportRouteId){
@@ -561,12 +604,59 @@ public class MapDrawHelper {
         }
 
 
-        private double distance(LatLng p1, LatLng p2){
-            int R = 6371; /*Earth radius*/
-            return (Math.acos(Math.sin(p1.latitude)*Math.sin(p2.latitude)+Math.cos(p1.latitude)*Math.cos(p2.latitude) * Math.cos(p2.longitude-p1.longitude)) * R)/10;
+
+
+
+    }
+
+    private double distance(LatLng p1, LatLng p2){
+        int R = 6371; /*Earth radius*/
+        return (Math.acos(Math.sin(p1.latitude)*Math.sin(p2.latitude)+Math.cos(p1.latitude)*Math.cos(p2.latitude) * Math.cos(p2.longitude-p1.longitude)) * R)/10;
+    }
+
+    private void sort(LatLng[] points, double[] distances){
+        int i;
+        boolean flag = true;
+        double temp;
+        LatLng temp_point;
+
+        while (flag)
+        {
+            flag= false;
+            for( i=0; i < distances.length -1; i++)
+            {
+                if ( distances[ i ] > distances[i+1] )
+                {
+                    temp = distances[i];
+                    distances[i] = distances[i+1];
+                    distances[i+1] = temp;
+                    temp_point = points[i];
+                    points[i] = points[i+1];
+                    points[i+1] = temp_point;
+                    flag = true;
+                }
+            }
         }
 
+    }
 
+
+    private double calculateAngle(LatLng point1, LatLng point2){
+
+
+        double dLon = (point2.longitude - point1.longitude);
+
+        double y = Math.sin(dLon) * Math.cos(point2.latitude);
+        double x = Math.cos(point1.latitude) * Math.sin(point2.latitude) - Math.sin(point1.latitude)
+                * Math.cos(point2.latitude) * Math.cos(dLon);
+
+        double brng = Math.atan2(y, x);
+
+        brng = Math.toDegrees(brng);
+        brng = (brng + 360) % 360;
+        brng = 360 - brng;
+
+        return brng;
     }
 
 }
