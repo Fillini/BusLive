@@ -27,10 +27,10 @@
         android:theme="@style/AppTheme">
 
 
-       <!--<meta-data
+       <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="AIzaSyBbt4GhaAcXZicS4iE5UlMdEjz7UZ_4omg"></meta-data>
-            -->
+
 
 
                <!--<meta-data
@@ -40,9 +40,9 @@
 
 
         <!-- release key -->
-        <meta-data
+        <!--<meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyCbcBOEhxvuDZSn1kRPShgvjHSphGnXmYQ"></meta-data>
+            android:value="AIzaSyCbcBOEhxvuDZSn1kRPShgvjHSphGnXmYQ"></meta-data>-->
         <!-- release key -->
 
 
@@ -59,14 +59,6 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
-        </activity>
-        <activity
-            android:name=".RoutesActivity"
-            android:label="@string/title_activity_routes"></activity>
-        <activity
-            android:name=".StationActivity"
-            android:label="@string/title_activity_station">
 
         </activity>
 

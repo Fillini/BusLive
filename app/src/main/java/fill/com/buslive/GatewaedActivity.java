@@ -1,5 +1,6 @@
 package fill.com.buslive;
 
+import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -8,6 +9,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.util.TypedValue;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import fill.com.buslive.fragments.RoutesFragment;
 import fill.com.buslive.http.GeocodingGateway;
@@ -25,6 +28,8 @@ public class GatewaedActivity extends AppCompatActivity implements
     PeriodicGateway periodicGateway;
     ServerGateway gateway;
     SPHelper spHelper;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +58,7 @@ public class GatewaedActivity extends AppCompatActivity implements
         super.onDestroy();
         periodicGateway.destroy();
     }
+
 
 
     public <T extends Fragment> T findFragment(String tag, Class<T> type) throws IllegalAccessException, InstantiationException {

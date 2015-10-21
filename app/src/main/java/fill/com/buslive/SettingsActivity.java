@@ -188,8 +188,6 @@ public class SettingsActivity extends PreferenceActivity implements ResponseCall
             gateway.getCountries();
         }
 
-
-
     }
 
     @Override
@@ -364,6 +362,7 @@ public class SettingsActivity extends PreferenceActivity implements ResponseCall
 
     @Override
     public void onFailure(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+        String mes = "Ошибка получения данных";
+        Toast.makeText(this, mes, Toast.LENGTH_LONG).show();
     }
 }

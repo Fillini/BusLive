@@ -97,6 +97,7 @@ public class MainActivity extends GatewaedActivity implements GoogleMap.OnMyLoca
     LinearLayout slide_container;
 
 
+
     public static final int SETTINGS_RESULT = 1;
     public static final int ROUTES_RESULT = 2;
 
@@ -174,6 +175,27 @@ public class MainActivity extends GatewaedActivity implements GoogleMap.OnMyLoca
             gateway.getRouteStations(spHelper.getCity());
         }
 
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_bus_live, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                Intent intent = new Intent(this, SettingsActivity.class);
+                startActivityForResult(intent, SETTINGS_RESULT);
+                break;
+            default:
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
 
@@ -414,25 +436,7 @@ public class MainActivity extends GatewaedActivity implements GoogleMap.OnMyLoca
 
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_bus_live, menu);
-        return super.onCreateOptionsMenu(menu);
-    }
 
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_settings:
-                Intent intent = new Intent(this, SettingsActivity.class);
-                startActivityForResult(intent, SETTINGS_RESULT);
-                break;
-            default:
-                break;
-        }
-        return super.onOptionsItemSelected(item);
-    }
 
     /**
      * Метод получает выбраные маршруты и запускает  периодическое обновление координат автобусов
@@ -470,6 +474,7 @@ public class MainActivity extends GatewaedActivity implements GoogleMap.OnMyLoca
             spHelper.setCoords(geocode.getLatitude() + ";" + geocode.getLongitude());
             map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(geocode.getLatitude(), geocode.getLongitude()), current_zoom));
             /*обновляем данные об остановках*/
+            routes = null;
             gateway.getStations(spHelper.getCity());
         }
         if (response instanceof Busses) {
@@ -531,7 +536,6 @@ public class MainActivity extends GatewaedActivity implements GoogleMap.OnMyLoca
         } else {
             throw new RuntimeException("RoutesFragment is null");
         }
-
     }
 
     private void setTimeTableFragment(Routes routes_on_station) {
@@ -627,6 +631,16 @@ public class MainActivity extends GatewaedActivity implements GoogleMap.OnMyLoca
             }
         }
         return null;
-
     }
+
+
+
+
+    interface NetworkState{
+        void handle();
+    }
+
+
+
+
 }
