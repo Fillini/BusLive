@@ -56,6 +56,7 @@ import fill.com.buslive.http.pojo.Stations;
 import fill.com.buslive.utils.L;
 import fill.com.buslive.utils.LocationUtils;
 import fill.com.buslive.utils.MapDrawHelper;
+
 import material.MaterialProgressBar;
 
 
@@ -175,6 +176,9 @@ public class MainActivity extends GatewaedActivity implements GoogleMap.OnMyLoca
         if (routeStations == null) {
             gateway.getRouteStations(spHelper.getCity());
         }
+
+
+
 
     }
 

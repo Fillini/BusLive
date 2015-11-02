@@ -16,7 +16,7 @@ android {
         applicationId "fill.com.buslive"
         minSdkVersion 15
         targetSdkVersion 23
-        versionCode 10
+        versionCode 11
         versionName "2.1"
 
     }
@@ -56,5 +56,6 @@ dependencies {
     compile 'com.sothree.slidinguppanel:library:3.0.0'
     compile 'de.greenrobot:eventbus:2.4.0'
     compile 'com.google.android.gms:play-services-ads:8.1.0'
+
 
 }
