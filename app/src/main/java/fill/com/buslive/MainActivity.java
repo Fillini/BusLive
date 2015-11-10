@@ -99,7 +99,6 @@ public class MainActivity extends GatewaedActivity implements GoogleMap.OnMyLoca
     LinearLayout slide_container;
 
 
-
     public static final int SETTINGS_RESULT = 1;
     public static final int ROUTES_RESULT = 2;
 
@@ -162,7 +161,6 @@ public class MainActivity extends GatewaedActivity implements GoogleMap.OnMyLoca
         if (savedInstanceState != null) {
             restoreFromSavedInstance(savedInstanceState);
         }
-
 
         restoreSlidingPanelState();
 
@@ -450,11 +448,11 @@ public class MainActivity extends GatewaedActivity implements GoogleMap.OnMyLoca
      */
     public void setCheckedRoute(Routes checkedRoute) {
         this.checkedRoute = checkedRoute;
-        if (this.checkedRoute != null && this.checkedRoute.size() > 0) {
+        if (this.checkedRoute != null && this.checkedRoute.size() > 0 && mapDrawHelper!=null) {
             periodicGateway.startGetBusses(this.checkedRoute);
             mapDrawHelper.drawRoutes(this.checkedRoute);
         }
-        if (this.checkedRoute.size() == 0) {
+        if (this.checkedRoute.size() == 0 && mapDrawHelper!=null) {
             mapDrawHelper.drawRoutes(this.checkedRoute);
         }
     }

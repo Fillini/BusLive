@@ -15,10 +15,11 @@
         android:layout_marginTop="106dp" />
 
     <TextView
+        android:alpha="0"
         android:layout_marginBottom="50dp"
         android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"
-        android:textColor="#cdcdcd"
+        android:textColor="#bebebe"
         android:textSize="40sp"
         android:gravity="center"
         android:text="@string/app_name"
